@@ -10,8 +10,8 @@ class eZHideUnhide extends eZXMLInstallerHandler
 
     function execute( $xmlNode )
     {
-        $action = $xmlNode->attributeValue( 'action' );
-        $xmlNodeID = $xmlNode->attributeValue( 'nodeID' );
+        $action = $xmlNode->getAttribute( 'action' );
+        $xmlNodeID = $xmlNode->getAttribute( 'nodeID' );
 
         $nodeID = $this->getReferenceID( $xmlNodeID );
         if ( !$nodeID )
