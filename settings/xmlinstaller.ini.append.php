@@ -15,5 +15,6 @@ XMLInstallerHandler[]=ezcreateclass
 XMLInstallerHandler[]=ezcreaterole
 XMLInstallerHandler[]=ezcreatesection
 XMLInstallerHandler[]=ezcreateworkflow
+XMLInstallerHandler[]=ezsendmail
 
 */?>
