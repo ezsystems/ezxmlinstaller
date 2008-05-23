@@ -38,10 +38,10 @@ class eZCreateContent extends eZXMLInstallerHandler
             $objectInformation = array();
             $objectInformation['parentNode'] = $parentNodeID;
 
-            $objectInformation['classID'] = $objectNode->getAttribute( 'contentClass' );
+            $objectInformation['classID'] = $this->getReferenceID( $objectNode->getAttribute( 'contentClass' ) );
             $objectInformation['remoteID'] = $objectNode->getAttribute( 'remoteID' );
             $objectInformation['objectID'] = $objectNode->getAttribute( 'objectID' );
-            $objectInformation['sectionID'] = $objectNode->getAttribute( 'section' );
+            $objectInformation['sectionID'] = $this->getReferenceID( $objectNode->getAttribute( 'section' ) );
             $objectInformation['ownerID'] = $objectNode->getAttribute( 'owner' );
             $objectInformation['creatorID'] = $objectNode->getAttribute( 'creator' );
             $objectInformation['attributes'] = array();
