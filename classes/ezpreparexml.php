@@ -34,30 +34,27 @@ class eZPrepareXML
         {
             $tplInfo = $tpl->variable( "tpl_info" );
         }
-
-        if ( !is_array( $tplInfo ) )
+        if ( is_array( $tplInfo ) )
         {
-            return false;
+            foreach ( $tplInfo as $var => $info )
+            {
+                if ( isset( $info['info'] ) )
+                {
+                    $query = $info['info'];
+                }
+                else
+                {
+                    $query = 'Info for ' . $var;
+                }
+                $default = '';
+                if ( isset( $info['default'] ) )
+                {
+                    $default = $info['default'];
+                }
+                $value = eZPrepareXML::getUserInput( "Please enter \"" . $query . "\" (" . $default . "): ", $default );
+                $tpl->setVariable( $var, $value );
+            }
         }
-        foreach ( $tplInfo as $var => $info )
-        {
-            if ( isset( $info['info'] ) )
-            {
-                $query = $info['info'];
-            }
-            else
-            {
-                $query = 'Info for ' . $var;
-            }
-            $default = '';
-            if ( isset( $info['default'] ) )
-            {
-                $default = $info['default'];
-            }
-            $value = eZPrepareXML::getUserInput( "Please enter \"" . $query . "\" (" . $default . "): ", $default );
-            $tpl->setVariable( $var, $value );
-        }
-
         $content = &$tpl->fetch( $template );
         $xml = $tpl->variable( "xml_data" );
         return $xml;

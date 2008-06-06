@@ -23,22 +23,38 @@ class eZFeatureSelectType extends eZDataType
     */
     function initializeObjectAttribute( $contentObjectAttribute, $currentVersion, $originalContentObjectAttribute )
     {
-        if ( $currentVersion != false )
+        if ( $currentVersion == NULL )
         {
-//             $contentObjectAttributeID = $contentObjectAttribute->attribute( "id" );
-//             $currentObjectAttribute = eZContentObjectAttribute::fetch( $contentObjectAttributeID,
-//                                                                         $currentVersion );
-            $dataText = $originalContentObjectAttribute->attribute( "data_text" );
-            $contentObjectAttribute->setAttribute( "data_text", $dataText );
-        }
-        else
-        {
-/*            $contentClassAttribute = $contentObjectAttribute->contentClassAttribute();
-            $default = $contentClassAttribute->attribute( "data_text1" );
-            if ( $default !== "" )
+
+            $classAttribute = $contentObjectAttribute->attribute( 'contentclass_attribute' );
+            $templateLocation = $classAttribute->attribute( self::TEMPLATE_LOCATION_FIELD );
+            $template = 'design:' . $templateLocation;
+            $attrContent = array();
+            include_once( 'kernel/common/template.php' );
+            $tpl = templateInit();
+            $tpl->setVariable( 'availible_feature_list', false );
+
+            $content = $tpl->fetch( $template );
+
+            $featureList = false;
+            if ( $tpl->variable( "availible_feature_list" ) !== false )
             {
-                $contentObjectAttribute->setAttribute( "data_text", $default );
-            }*/
+                $featureList = $tpl->variable( "availible_feature_list" );
+            }
+
+            $defaultFeatureList = array();
+            if ( $featureList )
+            {
+                foreach ( $featureList as $key => $feature )
+                {
+                    if ( array_key_exists( 'default', $feature ) && $feature['default'] )
+                    {
+                        $defaultFeatureList[] = $key;
+                    }
+                }
+            }
+            $dataText = implode( ',', $defaultFeatureList );
+            $contentObjectAttribute->setAttribute( "data_text", $dataText );
         }
     }
 

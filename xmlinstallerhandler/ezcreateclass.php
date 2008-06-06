@@ -303,6 +303,11 @@ class eZCreateClass extends eZXMLInstallerHandler
         $newAttribute = eZContentClassAttribute::create( $classID, $datatype, $attrCreateInfo  );
 
         $dataType = $newAttribute->dataType();
+        if ( !$dataType )
+        {
+            $this->writeMessage( "\t\tUnknown datatype: '$datatype'", 'error' );
+            return false;
+        }
         $dataType->initializeClassAttribute( $newAttribute );
         $newAttribute->store();
         $dataType->unserializeContentClassAttribute( $newAttribute, $params['attribute-node'], $params['datatype-parameter'] );

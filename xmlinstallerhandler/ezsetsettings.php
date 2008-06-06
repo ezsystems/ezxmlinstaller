@@ -16,6 +16,8 @@ class eZSetSettings extends eZXMLInstallerHandler
             $fileName = $settingsFile->getAttribute( 'name' );
             $location = $settingsFile->getAttribute( 'location' );
 
+            eZDir::mkdir( $location );
+
             $this->writeMessage( "\tSetting settings: $location/$fileName", 'notice' );
             $ini = eZINI::instance( $fileName, $location, null, null, null, true );
             $settingsBlockList = $settingsFile->getElementsByTagName( 'SettingsBlock' );

@@ -48,8 +48,13 @@ class eZXMLInstallerHandlerManager
                                                                       'Class' => $className );
                     }
                     unset($handlerList[key($handlerList)]);
+                    $handler = current( $handlerList );
                 }
-            } while ( $handler = current( $handlerList ) );
+                else
+                {
+                    $handler = next( $handlerList );
+                }
+            } while ( $handler );
         }
     }
 
