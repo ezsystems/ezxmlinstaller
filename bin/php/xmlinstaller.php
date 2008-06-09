@@ -31,7 +31,10 @@ $cli->output( "Checking requirements..." );
 
 
 $user = eZUser::fetch( 14 );
-eZUser::setCurrentlyLoggedInUser( $user, 14 );
+if ( $user )
+{
+    eZUser::setCurrentlyLoggedInUser( $user, 14 );
+}
 
 
 if( !(isset($options['file']) or isset($options['template'])) )
@@ -55,6 +58,12 @@ else
     $script->shutdown( 1 );
 }
 $cli->output( "Going to create new siteaccess from data..." );
+
+if ( $xml == '' )
+{
+    $cli->error( "Couldn't load xml." );
+    $script->shutdown( 1 );
+}
 
 $dom = new DOMDocument(  );
 if ( !$dom->loadXML( $xml ) )

@@ -365,6 +365,8 @@ class eZModifyContent extends eZXMLInstallerHandler
 
             eZOperationHandler::execute( 'content', 'publish', array( 'object_id' => $contentObject->attribute( 'id' ), 'version'   => $versionNumber ) );
 
+            eZContentCacheManager::clearObjectViewCacheIfNeeded( $contentObject->attribute( 'id' ) );
+
             $newNodeArray = eZContentObjectTreeNode::fetchByContentObjectID( $contentObject->attribute( 'id' ) );
             $refArray = false;
             if ( $newNodeArray && count($newNodeArray) >= 1 )
