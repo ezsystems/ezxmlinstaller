@@ -12,6 +12,7 @@ class eZCreateClass extends eZXMLInstallerHandler
     {
         $classList = $xml->getElementsByTagName( 'ContentClass' );
         $refArray = array();
+        $availableLanguageList = eZContentLanguage::fetchLocaleList();
         foreach ( $classList as $class )
         {
             $user = eZUser::currentUser();
@@ -45,7 +46,10 @@ class eZCreateClass extends eZXMLInstallerHandler
                         $nameList = array();
                         foreach ( $attributes as $index=>$attr )
                         {
-                            $nameList[$attr->name] = $attr->value;
+                            if ( in_array( $attr->name, $availableLanguageList ) )
+                            {
+                                $nameList[$attr->name] = $attr->value;
+                            }
                         }
                     }
                 }
@@ -75,6 +79,14 @@ class eZCreateClass extends eZXMLInstallerHandler
                     case 'replace':
                     {
                         $this->writeMessage( "\t\tClass '$classIdentifier' will be replaced.", 'notice' );
+                        foreach ( $nameList as $lang => $name )
+                        {
+                            if ( in_array( $lang, $availableLanguageList ) )
+                            {
+                                $class->setName( $name, $lang );
+                            }
+                        }
+                        $class->store();
                         /* TODO: Remove all attributes */
                     } break;
                     case 'new':
@@ -86,6 +98,14 @@ class eZCreateClass extends eZXMLInstallerHandler
                     case 'extend':
                     {
                         $this->writeMessage( "\t\tClass '$classIdentifier' will be extended.", 'notice' );
+                        foreach ( $nameList as $lang => $name )
+                        {
+                            if ( in_array( $lang, $availableLanguageList ) )
+                            {
+                                $class->setName( $name, $lang );
+                            }
+                        }
+                        $class->store();
                     } break;
                     case 'skip':
                     default:
@@ -192,6 +212,16 @@ class eZCreateClass extends eZXMLInstallerHandler
                 }
                 else
                 {
+                    $this->writeMessage( "\t\tClass '$classIdentifier' will get updated Attribute '$attributeIdentifier'.", 'notice' );
+                    foreach ( $attributeNameList as $lang => $name )
+                    {
+                        if ( in_array( $lang, $availableLanguageList ) )
+                        {
+                            $classAttribute->setName( $name, $lang );
+                        }
+                    }
+                    $classAttribute->setAttribute( 'is_required', $attributeIsRequired ? 1 : 0 );
+                    $classAttribute->store();
                     /* TODO update! */
                 }
             }

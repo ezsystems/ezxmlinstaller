@@ -65,7 +65,7 @@ if ( $xml == '' )
     $script->shutdown( 1 );
 }
 
-$dom = new DOMDocument(  );
+$dom = new DOMDocument( '1.0', 'utf-8' );
 if ( !$dom->loadXML( $xml ) )
 {
     $cli->error( "Couldn't load xml." );

@@ -414,7 +414,7 @@ class eZCreateContent extends eZXMLInstallerHandler
                 if ( $newNode )
                 {
                     $refArray = array( "node_id"   => $newNode->attribute( 'node_id' ),
-                                       "name"      => $contentObject->attribute( 'name' ),
+                                       "name"      => $contentObjectVersion->attribute( 'name' ),
                                        "object_id" => $contentObject->attribute( 'id' ) );
                 }
             }
