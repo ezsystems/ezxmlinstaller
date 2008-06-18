@@ -280,6 +280,12 @@ class eZCreateContent extends eZXMLInstallerHandler
                             if (  array_key_exists( 'title', $attributesContent ) )
                                 $title   = $attributesContent['title'];
 
+                            if ( array_key_exists( 'parseReferences', $attributesContent ) && $attributesContent['parseReferences'] == "true" )
+                            {
+                                $title = $this->parseAndReplaceStringReferences( $title );
+                                $url   = $this->parseAndReplaceStringReferences( $url );
+                            }
+
                             $attribute->setAttribute( 'data_text', $title );
                             $attribute->setContent( $url );
                         } break;

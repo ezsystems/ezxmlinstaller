@@ -25,7 +25,10 @@ class eZModifyContent extends eZXMLInstallerHandler
         {
             $nodeID = $xmlNode->getAttribute( 'nodeID' );
             $contentNode = eZContentObjectTreeNode::fetch( $nodeID );
-            $objectID = $contentNode->attribute( 'contentobject_id' );
+            if ( $contentNode )
+            {
+                $objectID = $contentNode->attribute( 'contentobject_id' );
+            }
         }
         if ( !$objectID )
         {
@@ -132,14 +135,7 @@ class eZModifyContent extends eZXMLInstallerHandler
         {
             $db->begin();
             $versionNumber  = $contentObjectVersion->attribute( 'version' );
-            $nodeAssignment = eZNodeAssignment::create(
-                    array(  'contentobject_id'      => $contentObject->attribute( 'id' ),
-                            'contentobject_version' => $versionNumber,
-                            'parent_node'           => $objectInformation['parentNode'],
-                            'is_main'               => 1
-                            )
-            );
-            $nodeAssignment->store();
+
             $dataMap = $contentObjectVersion->dataMap();
             foreach ( $objectInformation['attributes'] as $attributeName => $attributesContent )
             {
@@ -238,6 +234,12 @@ class eZModifyContent extends eZXMLInstallerHandler
                                 $url   = $attributesContent['url'];
                             if (  array_key_exists( 'title', $attributesContent ) )
                                 $title   = $attributesContent['title'];
+
+                            if ( array_key_exists( 'parseReferences', $attributesContent ) && $attributesContent['parseReferences'] == "true" )
+                            {
+                                $title = $this->parseAndReplaceStringReferences( $title );
+                                $url   = $this->parseAndReplaceStringReferences( $url );
+                            }
 
                             $attribute->setAttribute( 'data_text', $title );
                             $attribute->setContent( $url );
@@ -364,6 +366,26 @@ class eZModifyContent extends eZXMLInstallerHandler
             $db->commit();
 
             eZOperationHandler::execute( 'content', 'publish', array( 'object_id' => $contentObject->attribute( 'id' ), 'version'   => $versionNumber ) );
+
+            // set chosen hidden/invisible attributes for object nodes
+            $http          = eZHTTPTool::instance();
+            $assignedNodes = $contentObject->assignedNodes( true );
+            foreach ( $assignedNodes as $node )
+            {
+                $nodeID               = $node->attribute( 'node_id' );
+                $parentNodeID         = $node->attribute( 'parent_node_id' );
+
+                $db = eZDB::instance();
+                $db->begin();
+                $parentNode = eZContentObjectTreeNode::fetch( $parentNodeID );
+                eZContentObjectTreeNode::updateNodeVisibility( $node, $parentNode, /* $recursive = */ false );
+                $db->commit();
+                unset( $node, $parentNode );
+            }
+            unset( $assignedNodes );
+
+
+
 
             eZContentCacheManager::clearObjectViewCacheIfNeeded( $contentObject->attribute( 'id' ) );
 
