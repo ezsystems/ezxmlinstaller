@@ -138,8 +138,8 @@ E.g.
                              'type',     'int' ),
         'var2',      hash(   'info',     'URL to siteaccess',
                              'type',     'string',
-                             'default',  'http://mmc.ez' ))}
-This will request two variables. "var1" and "var2"
+                             'default',  'http://ez.no' ))}
+			     This will request two variables. "var1" and "var2"
 The hash of each variable defines the additional information.
 * info:    The info text for the request.
 * type:    The type of the variable (int or string)
