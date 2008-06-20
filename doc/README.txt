@@ -1,4 +1,4 @@
-eZ XML Installer extension 0.0.1 README
+eZ XML Installer extension 0.1.2 README
 
 
 What is the eZ XML Installer extension?
@@ -18,7 +18,7 @@ What is the eZ XML Installer extension?
 eZ XML Installer version
 ========================
 
-The current version of eZ XML Installer is 0.0.1.
+The current version of eZ XML Installer is 0.1.2.
 You can find details about changes for this version in
 doc/changelogs/
 
@@ -37,7 +37,7 @@ The following requirements exists for using eZ XML Installer extension:
 
 o  eZ Publish version:
 
-   Make sure you use eZ Publish version 3.9 or higher.
+   Make sure you use eZ Publish version 4.0 or higher.
 
 o  PHP version:
 
@@ -138,7 +138,7 @@ E.g.
                              'type',     'int' ),
         'var2',      hash(   'info',     'URL to siteaccess',
                              'type',     'string',
-                             'default',  'http://mmc.ez' ))}
+                             'default',  'http://ez.no' ))}
 This will request two variables. "var1" and "var2"
 The hash of each variable defines the additional information.
 * info:    The info text for the request.

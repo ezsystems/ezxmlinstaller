@@ -1,4 +1,4 @@
-eZ XML Installer extension 0.0.1 INSTALL
+eZ XML Installer extension 0.1.2 INSTALL
 
 
 What is the eZ XML Installer extension?
@@ -17,7 +17,7 @@ The following requirements exists for using eZ Personal Frontpage extension:
 
 o  eZ Publish version:
 
-   Make sure you use eZ Publish version 3.9 or higher.
+   Make sure you use eZ Publish version 4.0 or higher.
 
 o  PHP version:
 
@@ -31,7 +31,7 @@ You can download a version of eZ Publish from ez.no, you will find the
 various versions at:
 http://ez.no/download/ez_publish
 
-NOTE: You will need eZ Publish 3.9 or higher.
+NOTE: You will need eZ Publish 4.0 or higher.
 
 Information on the installation of eZ Publish can be found at:
 http://ez.no/doc
@@ -54,11 +54,11 @@ Installing eZ XML Installer extension
 
    Linux users may use of the following commands depending on the file type:
    [tar.gz]:
-   $ tar -zxvf ezxmlinstaller-extension-0.0.1.tar.gz
+   $ tar -zxvf ezxmlinstaller-extension-0.1.2.tar.gz
    [bz2]:
-   $ tar -jxvf ezxmlinstaller-extension-0.0.1.bz2
+   $ tar -jxvf ezxmlinstaller-extension-0.1.2.bz2
    [zip]:
-   $ unzip ezxmlinstaller-extension-0.0.1.zip
+   $ unzip ezxmlinstaller-extension-0.1.2.zip
 
 
 4. Enable the extension in eZ Publish.
