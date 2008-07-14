@@ -163,7 +163,7 @@ class eZCreateClass extends eZXMLInstallerHandler
                 $attributeIsRequired = strtolower( $classAttributeNode->getAttribute( 'required' ) ) == 'true';
                 $attributeIsSearchable = strtolower( $classAttributeNode->getAttribute( 'searchable' ) ) == 'true';
                 $attributeIsInformationCollector = strtolower( $classAttributeNode->getAttribute( 'informationCollector' ) ) == 'true';
-                $attributeIsTranslatable = strtolower( $classAttributeNode->getAttribute( 'translatable' ) ) == 'true';
+                $attributeIsTranslatable = (strtolower( $classAttributeNode->getAttribute( 'translatable' ) ) == 'false') ? 0 : 1;
                 $attributeIdentifier = $classAttributeNode->getAttribute( 'identifier' );
                 $attributePlacement = $classAttributeNode->getAttribute( 'placement' );
 
@@ -199,7 +199,7 @@ class eZCreateClass extends eZXMLInstallerHandler
                     $params['serialized_name_list']     = $classAttributeNameList->serializeNames();
                     $params['data_type_string']         = $attributeDatatype;
                     $params['default_value']            = '';
-                    $params['can_translate']            = '';
+                    $params['can_translate']            = $attributeIsTranslatable;
                     $params['is_required']              = $attributeIsRequired;
                     $params['is_searchable']            = $attributeIsSearchable;
                     $params['content']                  = '';
