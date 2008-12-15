@@ -264,7 +264,11 @@ class eZCreateContent extends eZXMLInstallerHandler
                             if ( $objectID )
                             {
                                 $attribute->setAttribute( 'data_int', $objectID );
-                                eZContentObject::fetch( $objectID )->addContentObjectRelation( $objectID, $versionNumber, $contentObject->attribute( 'id' ), $attribute->attribute( 'contentclassattribute_id' ),    eZContentObject::RELATION_ATTRIBUTE );
+				$object = eZContentObject::fetch( $objectID );
+				if ( $object )
+				{
+                                    $object->addContentObjectRelation( $objectID, $versionNumber, $contentObject->attribute( 'id' ), $attribute->attribute( 'contentclassattribute_id' ),    eZContentObject::RELATION_ATTRIBUTE );
+				}
                             }
                             else
                             {
