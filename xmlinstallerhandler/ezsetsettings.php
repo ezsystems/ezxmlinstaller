@@ -1,4 +1,28 @@
 <?php
+//
+// Created on: <2007-12-28 06:09:00 dis>
+//
+// SOFTWARE NAME: eZ XML Installer extension for eZ Publish
+// SOFTWARE RELEASE: 0.x
+// COPYRIGHT NOTICE: Copyright (C) 1999-2010 eZ Systems AS
+// SOFTWARE LICENSE: GNU General Public License v2.0
+// NOTICE: >
+//   This program is free software; you can redistribute it and/or
+//   modify it under the terms of version 2.0  of the GNU General
+//   Public License as published by the Free Software Foundation.
+//
+//   This program is distributed in the hope that it will be useful,
+//   but WITHOUT ANY WARRANTY; without even the implied warranty of
+//   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//   GNU General Public License for more details.
+//
+//   You should have received a copy of version 2.0 of the GNU General
+//   Public License along with this program; if not, write to the Free
+//   Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+//   MA 02110-1301, USA.
+//
+//
+
 include_once('extension/ezxmlinstaller/classes/ezxmlinstallerhandler.php');
 
 class eZSetSettings extends eZXMLInstallerHandler
@@ -17,8 +41,31 @@ class eZSetSettings extends eZXMLInstallerHandler
             $location = $settingsFile->getAttribute( 'location' );
 
             eZDir::mkdir( $location );
+            $fileNamePath = $location . eZDir::separator( eZDir::SEPARATOR_LOCAL ) . $fileName;
 
-            $this->writeMessage( "\tSetting settings: $location/$fileName", 'notice' );
+            $this->writeMessage( "\tSetting settings: $fileNamePath", 'notice' );
+
+            if ( !file_exists( $fileNamePath ) )
+            {
+                if ( !is_writeable( $location ) )
+                {
+                    $this->writeMessage( "\tFile $fileNamePath can not be created. Skipping.", 'notice' );
+                    continue;
+                }
+            }
+            else
+            {
+                if ( !is_readable( $fileName ) )
+                {
+                    $this->writeMessage( "\tFile $fileNamePath is not readable. Skipping.", 'notice' );
+                    continue;
+                }
+                if ( !is_writeable( $fileName ) )
+                {
+                    $this->writeMessage( "\tFile $fileNamePath is not writeable. Skipping.", 'notice' );
+                    continue;
+                }
+            }
             $ini = eZINI::instance( $fileName, $location, null, null, null, true );
             $settingsBlockList = $settingsFile->getElementsByTagName( 'SettingsBlock' );
             foreach ( $settingsBlockList as $settingsBlock )
@@ -29,8 +76,10 @@ class eZSetSettings extends eZXMLInstallerHandler
                 foreach ( $values as $value )
                 {
                     $variableName = $value->nodeName;
-                    if ($value->nodeName == "#text" )
+                    if ( $value->nodeName == "#text" )
+                    {
                         continue;
+                    }
 
                     if ( get_class($value) == 'DOMElement' && $value->hasAttribute( 'value' ) )
                     {
@@ -69,7 +118,11 @@ class eZSetSettings extends eZXMLInstallerHandler
                     {
                         $settingValue = $this->parseAndReplaceStringReferences( $value->textContent );
                     }
-                    $existingVar = $ini->variable( $blockName, $variableName );
+                    $existingVar = false;
+                    if ( $ini->hasVariable( $blockName, $variableName ) )
+                    {
+                        $existingVar = $ini->variable( $blockName, $variableName );
+                    }
                     if ( is_string( $existingVar ) && is_string( $settingValue ) )
                     {
                         $ini->setVariable( $blockName, $variableName, $settingValue );

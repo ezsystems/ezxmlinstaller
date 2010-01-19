@@ -1,4 +1,28 @@
 <?php
+//
+// Created on: <2007-12-28 06:09:00 dis>
+//
+// SOFTWARE NAME: eZ XML Installer extension for eZ Publish
+// SOFTWARE RELEASE: 0.x
+// COPYRIGHT NOTICE: Copyright (C) 1999-2010 eZ Systems AS
+// SOFTWARE LICENSE: GNU General Public License v2.0
+// NOTICE: >
+//   This program is free software; you can redistribute it and/or
+//   modify it under the terms of version 2.0  of the GNU General
+//   Public License as published by the Free Software Foundation.
+//
+//   This program is distributed in the hope that it will be useful,
+//   but WITHOUT ANY WARRANTY; without even the implied warranty of
+//   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//   GNU General Public License for more details.
+//
+//   You should have received a copy of version 2.0 of the GNU General
+//   Public License along with this program; if not, write to the Free
+//   Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+//   MA 02110-1301, USA.
+//
+//
+
 include_once('extension/ezxmlinstaller/classes/ezxmlinstallerhandler.php');
 
 class eZCreateContent extends eZXMLInstallerHandler
@@ -128,7 +152,7 @@ class eZCreateContent extends eZXMLInstallerHandler
             $contentObject = eZContentObject::fetchByRemoteId( $objectInformation['remoteID'] );
             if (  $contentObject )
             {
-                $this->writeMessage( "\t[".$objectInformation['remoteID']."] Object exists: " . $contentObject->attribute("name"), 'notice' );
+                $this->writeMessage( "\t[".$objectInformation['remoteID']."] Object exists: " . $contentObject->attribute("name") . ". Creating new version.", 'notice' );
                 $contentObjectVersion = $contentObject->createNewVersion();
             }
         }
@@ -137,7 +161,7 @@ class eZCreateContent extends eZXMLInstallerHandler
             $contentObject = eZContentObject::fetch( $objectInformation['objectID'] );
             if (  $contentObject )
             {
-                $this->writeMessage( "\t[".$objectInformation['remoteID']."] Object exists: " . $contentObject->attribute("name"), 'notice' );
+                $this->writeMessage( "\t[".$objectInformation['remoteID']."] Object exists: " . $contentObject->attribute("name") . ". Creating new version.", 'notice' );
                 $contentObjectVersion = $contentObject->createNewVersion();
             }
         }
@@ -260,19 +284,19 @@ class eZCreateContent extends eZXMLInstallerHandler
                         } break;
                         case 'ezobjectrelation':
                         {
-                            $objectID = $this->getReferenceID( $attributesContent['content'] );
-                            if ( $objectID )
+                            $relationContent = trim( $attributesContent['content'] );
+                            if ( $relationContent != '' )
                             {
-                                $attribute->setAttribute( 'data_int', $objectID );
-				$object = eZContentObject::fetch( $objectID );
-				if ( $object )
-				{
-                                    $object->addContentObjectRelation( $objectID, $versionNumber, $contentObject->attribute( 'id' ), $attribute->attribute( 'contentclassattribute_id' ),    eZContentObject::RELATION_ATTRIBUTE );
-				}
-                            }
-                            else
-                            {
-                                $this->writeMessage( "\tReference " . $attributesContent['content'] . " not set.", 'warning' );
+                                $objectID = $this->getReferenceID( $attributesContent['content'] );
+                                if ( $objectID )
+                                {
+                                    $attribute->setAttribute( 'data_int', $objectID );
+                                    eZContentObject::fetch( $objectID )->addContentObjectRelation( $objectID, $versionNumber, $contentObject->attribute( 'id' ), $attribute->attribute( 'contentclassattribute_id' ),    eZContentObject::RELATION_ATTRIBUTE );
+                                }
+                                else
+                                {
+                                    $this->writeMessage( "\tReference " . $attributesContent['content'] . " not set.", 'warning' );
+                                }
                             }
                         } break;
                         case 'ezurl':

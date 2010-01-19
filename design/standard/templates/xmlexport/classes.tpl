@@ -25,10 +25,10 @@
                     identifier="{$attribute.identifier}"
                     placement="{$attribute.placement}">
                 <Names {foreach $attribute.nameList as $key => $name}{$key}="{$name|urlencode}" {/foreach} />
-                <DatatypeParameters>
-                    {foreach $opt_list[$class.identifier][$attribute.identifier] as $key => $value}
-                    <{$key}>{$value}</{$key}>
-                {/foreach}
+                <DatatypeParameters>{$opt_list[$class.identifier][$attribute.identifier]}
+{*                     {foreach $opt_list[$class.identifier][$attribute.identifier] as $key => $value} *}
+{*                     <{$key}>{$value}</{$key}> *}
+{*                 {/foreach} *}
                 </DatatypeParameters>
             </Attribute>
             {/foreach}
