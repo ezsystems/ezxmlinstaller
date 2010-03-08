@@ -134,7 +134,11 @@ class eZSetSettings extends eZXMLInstallerHandler
                     }
                     elseif ( is_array( $existingVar ) && is_array( $settingValue ) )
                     {
-                        $mergedArray = array_merge( $existingVar, $settingValue );
+                        // an empty value in a list means a reset of the setting
+                        if ( array_search( "", $settingValue, true ) !== false )
+                            $mergedArray = $settingValue;
+                        else
+                            $mergedArray = array_merge( $existingVar, $settingValue );
                         $ini->setVariable( $blockName, $variableName, array_unique( $mergedArray ) );
                     }
                     else

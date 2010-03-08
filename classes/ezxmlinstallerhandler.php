@@ -68,7 +68,7 @@ class eZXMLInstallerHandler
 
     function getReferenceID( $refInfo )
     {
-        $splitted = preg_split( '/:/', $refInfo );
+        $splitted = explode( ':', $refInfo );
         if ( !(is_array( $splitted ) && count($splitted) == 2 ) )
         {
             return $refInfo;
