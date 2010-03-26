@@ -28,7 +28,7 @@ class ezxmlinstallerInfo
     public static function info()
     {
         return array( 'Name' => "eZ Publish XML Installer",
-                      'Version' => "0.1.5",
+                      'Version' => "1.0.0",
                       'Copyright' => "Copyright (C) 1999-2010 eZ Systems AS",
                       'License' => "GNU General Public License v2.0"
                      );
