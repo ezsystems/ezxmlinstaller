@@ -150,6 +150,7 @@ class eZSetSettings extends eZXMLInstallerHandler
             $ini->save( false, ".append.php" );
             unset( $ini );
         }
+        eZCache::clearByID( array( 'ini', 'global_ini' ) );
     }
 
     static public function handlerInfo()
