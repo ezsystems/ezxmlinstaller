@@ -66,7 +66,7 @@ class eZSetSettings extends eZXMLInstallerHandler
                     continue;
                 }
             }
-            $ini = eZINI::instance( $fileName, $location, null, null, null, true );
+            $ini = eZINI::instance( $fileName, $location, null, null, null, true, true );
             $settingsBlockList = $settingsFile->getElementsByTagName( 'SettingsBlock' );
             foreach ( $settingsBlockList as $settingsBlock )
             {
