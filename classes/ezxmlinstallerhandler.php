@@ -76,6 +76,7 @@ class eZXMLInstallerHandler
         $type = $splitted[0];
         $refID = $splitted[1];
         $referenceID = false;
+
         switch( $type )
         {
             case 'internal':
@@ -117,12 +118,12 @@ class eZXMLInstallerHandler
                    $referenceID = $relContentObject->ID;
                }
             } break;
-            case 'node_remote_id':
+            case 'remote_id_node_id':
             {
-               $relNode = eZContentObjectTreeNode::fetchByRemoteID( $refID );
-               if ( $relNode )
+               $relContentObject = eZContentObject::fetchByRemoteID( $refID );
+               if ( $relContentObject )
                {
-                   $referenceID = $relNode->ID;
+                   $referenceID = $relContentObject->mainNodeID();
                }
             } break;
         }
