@@ -109,6 +109,22 @@ class eZXMLInstallerHandler
                     }
                 }
             } break;
+            case 'remote_id':
+            {
+               $relContentObject = eZContentObject::fetchByRemoteID( $refID );
+               if ( $relContentObject )
+               {
+                   $referenceID = $relContentObject->ID;
+               }
+            } break;
+            case 'node_remote_id':
+            {
+               $relNode = eZContentObjectTreeNode::fetchByRemoteID( $refID );
+               if ( $relNode )
+               {
+                   $referenceID = $relNode->ID;
+               }
+            } break;
         }
         return $referenceID;
     }
