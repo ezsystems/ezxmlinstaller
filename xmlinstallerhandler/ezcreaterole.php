@@ -67,7 +67,7 @@ class eZCreateRole extends eZXMLInstallerHandler
                             {
                                 $policyLimitationList[$limitation->nodeName] = array();
                             }
-                            $policyLimitationList[$limitation->nodeName][] = $this->getReferenceID( $limitation->textContent );
+                            $policyLimitationList[$limitation->nodeName][] = $this->getLimitationValue($limitation->nodeName, $limitation->textContent);
                         }
                     }
                 }
@@ -116,6 +116,23 @@ class eZCreateRole extends eZXMLInstallerHandler
             }
         }
         $this->addReference( $refArray );
+    }
+    
+    
+    private function getLimitationValue($limitationType, $limitationValue){
+    	$limitationValue = $this->getReferenceID( $limitationValue );
+    	switch($limitationType){
+    		case 'Subtree':
+    				//Subtree limitations need to store path_string instead of node_id
+    			$val = (int)$limitationValue;
+    			if($val > 0){ 
+    				$node = eZContentObjectTreeNode::fetch($val);
+    				$limitationValue = $node->attribute( 'path_string' );
+    			}
+   				break;
+     	}
+    	
+    	return $limitationValue;
     }
 
     static public function handlerInfo()
