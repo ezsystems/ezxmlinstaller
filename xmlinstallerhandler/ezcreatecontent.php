@@ -60,7 +60,7 @@ class eZCreateContent extends eZXMLInstallerHandler
             if ( $objectNode->nodeName != 'ContentObject' )
                 continue;
             $objectInformation = array();
-            $objectInformation['parentNode'] = $parentNodeID;
+            $objectInformation['parentNode'] = $this->getReferenceID($parentNodeID);
 
             $objectInformation['classID'] = $this->getReferenceID( $objectNode->getAttribute( 'contentClass' ) );
             $objectInformation['remoteID'] = $objectNode->getAttribute( 'remoteID' );
