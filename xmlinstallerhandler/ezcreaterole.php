@@ -130,6 +130,12 @@ class eZCreateRole extends eZXMLInstallerHandler
     				$limitationValue = $node->attribute( 'path_string' );
     			}
    				break;
+    		case 'SiteAccess':
+	    			//siteaccess name must be crc32'd
+    			if(!is_int($limitationValue)){ 
+	    			$limitationValue = eZSys::ezcrc32($limitationValue);
+    			}
+    			break;
      	}
     	
     	return $limitationValue;
