@@ -112,19 +112,19 @@ class eZXMLInstallerHandler
             } break;
             case 'remote_id':
             {
-               $relContentObject = eZContentObject::fetchByRemoteID( $refID );
-               if ( $relContentObject )
-               {
-                   $referenceID = $relContentObject->ID;
-               }
+                $relContentObject = eZContentObject::fetchByRemoteID( $refID );
+                if ( $relContentObject )
+                {
+                    $referenceID = $relContentObject->ID;
+                }
             } break;
             case 'remote_id_node_id':
             {
-               $relContentObject = eZContentObject::fetchByRemoteID( $refID );
-               if ( $relContentObject )
-               {
-                   $referenceID = $relContentObject->mainNodeID();
-               }
+                $relContentObject = eZContentObject::fetchByRemoteID( $refID );
+                if ( $relContentObject )
+                {
+                    $referenceID = $relContentObject->mainNodeID();
+                }
             } break;
         }
         return $referenceID;
