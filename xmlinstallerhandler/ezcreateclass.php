@@ -27,6 +27,12 @@ include_once('extension/ezxmlinstaller/classes/ezxmlinstallerhandler.php');
 
 class eZCreateClass extends eZXMLInstallerHandler
 {
+    /**
+     * Tells execute algorithm to adjust current class's attributes placement if needed
+     *
+     * @var boolean
+     */
+    private $_adjustAttributesPlacement = false;
 
     function eZCreateClass( )
     {
@@ -39,6 +45,8 @@ class eZCreateClass extends eZXMLInstallerHandler
         $availableLanguageList = eZContentLanguage::fetchLocaleList();
         foreach ( $classList as $class )
         {
+            $this->_adjustAttributesPlacement = false;
+
             $user = eZUser::currentUser();
             $userID = $user->attribute( 'contentobject_id' );
 
@@ -253,6 +261,17 @@ class eZCreateClass extends eZXMLInstallerHandler
                 }
             }
 
+            if( $this->_adjustAttributesPlacement )
+            {
+                $this->writeMessage( "\t\tAdjusting attributes placement.", 'notice' );
+                $attributes = $class->fetchAttributes();
+                $class->adjustAttributePlacements( $attributes );
+                foreach( $attributes as $attribute )
+                {
+                    $attribute->store();
+                }
+            }
+
             if ( count( $updateAttributeList ) )
             {
                 $this->writeMessage( "\t\tUpdating content object attributes.", 'notice' );
@@ -329,15 +348,15 @@ class eZCreateClass extends eZXMLInstallerHandler
 //     function removeClassAttribute( $params )
 //     {
 //         //include_once( 'kernel/classes/ezcontentclassattribute.php' );
-// 
+//
 //         $contentClassID = $params['class_id'];
 //         $classAttributeIdentifier = $params['attribute_identifier'];
-// 
+//
 //         // get attributes of 'temporary' version as well
 //         $classAttributeList = eZContentClassAttribute::fetchFilteredList( array( 'contentclass_id' => $contentClassID,
 //                                                                                   'identifier' => $classAttributeIdentifier ),
 //                                                                            true );
-// 
+//
 //         $validation = array();
 //         foreach( $classAttributeList as $classAttribute )
 //         {
@@ -350,7 +369,7 @@ class eZCreateClass extends eZXMLInstallerHandler
 //                     $objectAttributeID = $objectAttribute->attribute( 'id' );
 //                     $objectAttribute->removeThis( $objectAttributeID );
 //                 }
-// 
+//
 //                 $classAttribute->removeThis();
 //             }
 //             else
@@ -358,18 +377,18 @@ class eZCreateClass extends eZXMLInstallerHandler
 //                 $removeInfo = $dataType->classAttributeRemovableInformation( $classAttribute );
 //                 if( $removeInfo === false )
 //                     $removeInfo = "Unknow reason";
-// 
+//
 //                 $validation[] = array( 'id' => $classAttribute->attribute( 'id' ),
 //                                        'identifier' => $classAttribute->attribute( 'identifier' ),
 //                                        'reason' => $removeInfo );
 //             }
 //         }
-// 
+//
 //         if( count( $validation ) > 0 )
 //         {
 //             $this->reportError( $validation, 'eZSiteInstaller::removeClassAttribute: Unable to remove eZClassAttribute(s)' );
 //         }
-// 
+//
 //     }
 
     function addClassAttribute( $class, $params )
@@ -435,13 +454,12 @@ class eZCreateClass extends eZXMLInstallerHandler
         }
 
         $newAttribute->setAttribute( 'version', eZContentClass::VERSION_STATUS_DEFINED );
-        $newAttribute->setAttribute( 'placement', count( $attributes ) );
+        $placement = $params['placement'] ? intval( $params['placement'] ) : count( $attributes );
+        $newAttribute->setAttribute( 'placement',  $placement);
 
-        $class->adjustAttributePlacements( $attributes );
-        foreach( $attributes as $attribute )
-        {
-            $attribute->storeDefined();
-        }
+        $this->_adjustAttributesPlacement = true;
+
+        $newAttribute->storeDefined();
         $classAttributeID = $newAttribute->attribute( 'id' );
         return $classAttributeID;
     }
@@ -468,6 +486,12 @@ class eZCreateClass extends eZXMLInstallerHandler
         $classAttribute->setAttribute( 'is_searchable', $params['is_searchable']  );
         $classAttribute->setAttribute( 'can_translate', $params['can_translate']  );
         $classAttribute->setAttribute( 'is_information_collector', $params['is_information_collector']  );
+
+        if( $params['placement'] )
+        {
+            $classAttribute->setAttribute( 'placement', $params['placement'] );
+            $this->_adjustAttributesPlacement = true;
+        }
 
         $dataType = $classAttribute->dataType();
         $dataType->unserializeContentClassAttribute( $classAttribute, $params['attribute-node'], $params['datatype-parameter'] );
