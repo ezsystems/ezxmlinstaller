@@ -263,13 +263,9 @@ class eZCreateClass extends eZXMLInstallerHandler
 
             if( $this->_adjustAttributesPlacement )
             {
+                //once every attribute has been processed, we may reset placement
                 $this->writeMessage( "\t\tAdjusting attributes placement.", 'notice' );
-                $attributes = $class->fetchAttributes();
-                $class->adjustAttributePlacements( $attributes );
-                foreach( $attributes as $attribute )
-                {
-                    $attribute->store();
-                }
+                $this->_adjustClassAttributesPlacement($class);
             }
 
             if ( count( $updateAttributeList ) )
@@ -500,7 +496,22 @@ class eZCreateClass extends eZXMLInstallerHandler
 
     }
 
-
+    /**
+     * Updates placement for each attribute in a class instance
+     *
+     * @since 0.1.5
+     * @param eZContentClass $class class instance to update
+     * @return null
+     */
+    protected function _adjustClassAttributesPlacement(eZContentClass $class)
+    {
+        $attributes = $class->fetchAttributes();
+        $class->adjustAttributePlacements( $attributes );
+        foreach( $attributes as $attribute )
+        {
+            $attribute->store();
+        }
+    }
 }
 
 ?>
