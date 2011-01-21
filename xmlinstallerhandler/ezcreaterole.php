@@ -117,7 +117,7 @@ class eZCreateRole extends eZXMLInstallerHandler
         }
         $this->addReference( $refArray );
     }
-    
+
     /**
      * Returns a valid limitation value to be saved in database
      *
@@ -130,6 +130,15 @@ class eZCreateRole extends eZXMLInstallerHandler
         $limitationValue = $this->getReferenceID( $limitationValue );
         switch( $limitationType )
         {
+            case 'Class':
+            case 'ParentClass':
+                $class = eZContentClass::fetchByIdentifier( $limitationValue );
+                if( $class )
+                {
+                    $limitationValue = $class->ID;
+                }
+                break;
+
             case 'Subtree':
                 //Subtree limitations need to store path_string instead of node_id
                 $val = (int) $limitationValue;
@@ -139,6 +148,7 @@ class eZCreateRole extends eZXMLInstallerHandler
                     $limitationValue = $node->attribute( 'path_string' );
                 }
    	            break;
+
             case 'SiteAccess':
                 //siteaccess name must be crc32'd
                 if( !is_int( $limitationValue ) )
