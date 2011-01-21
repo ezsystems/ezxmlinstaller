@@ -391,6 +391,24 @@ class eZCreateContent extends eZXMLInstallerHandler
                             }
                         } break;
 
+                        case 'ezobjectrelationlist':
+                        {
+                            $relationContent = explode( ',', $attributesContent['content'] );
+                            if ( count( $relationContent ) )
+                            {
+                                $objectIDs = array();
+                                foreach( $relationContent as $relation )
+                                {
+                                    $objectIDs[] = $this->getReferenceID( trim ( $relation ) );
+                                }
+                                $attribute->fromString( implode( '-', $objectIDs ) );
+                            }
+                            else
+                            {
+                                eZDebug::writeWarning( $attributesContent['content'], "No relation declared" );
+                            }
+                        } break;
+
 
                         case 'ezauthor':
                         case 'ezbinaryfile':
@@ -404,15 +422,22 @@ class eZCreateContent extends eZXMLInstallerHandler
                         case 'ezmedia':
                         case 'ezmultioption':
                         case 'ezmultiprice':
-                        case 'ezobjectrelationlist':
                         case 'ezoption':
                         case 'ezpackage':
                         case 'ezproductcategory':
                         case 'ezrangeoption':
                         case 'ezsubtreesubscription':
                         case 'eztime':
+                        default:
                         {
-                            $this->writeMessage( "\tDatatype " . $dataType . " not supported yet.", 'warning' );
+                            try
+                            {
+                                $attribute->fromString($attributesContent['content']);
+                            }
+                            catch ( Exception $e )
+                            {
+                                $this->writeMessage( "\tDatatype " . $dataType . " fromString function rejected value " . $attributesContent['content'], 'warning' );
+                            }
                         } break;
 
                     }
