@@ -236,7 +236,7 @@ class eZCreateClass extends eZXMLInstallerHandler
 
                 $params = array();
                 $params['identifier']               = $attributeIdentifier;
-                $params['serialized_name_list']     = $classAttributeNameList->serializeNames();
+                $params['name_list']     = $classAttributeNameList;
                 $params['data_type_string']         = $attributeDatatype;
                 $params['default_value']            = '';
                 $params['can_translate']            = $attributeIsTranslatable;
@@ -392,7 +392,7 @@ class eZCreateClass extends eZXMLInstallerHandler
         $classID = $class->attribute( 'id' );
 
         $classAttributeIdentifier = $params['identifier'];
-        $classAttributeName = $params['serialized_name_list'];
+        $classAttributeNameList = $params['name_list'];
 
         $datatype = $params['data_type_string'];
         $defaultValue = isset( $params['default_value'] ) ? $params['default_value'] : false;
@@ -402,7 +402,7 @@ class eZCreateClass extends eZXMLInstallerHandler
         $attrContent  = isset( $params['content'] )       ? $params['content'] : false;
 
         $attrCreateInfo = array( 'identifier' => $classAttributeIdentifier,
-                                    'serialized_name_list' => $classAttributeName,
+                                    'serialized_name_list' => $classAttributeNameList->serializeNames(),
                                     'can_translate' => $canTranslate,
                                     'is_required' => $isRequired,
                                     'is_searchable' => $isSearchable );
@@ -465,7 +465,7 @@ class eZCreateClass extends eZXMLInstallerHandler
         $classID = $class->attribute( 'id' );
 
         $classAttributeIdentifier = $params['identifier'];
-        $classAttributeName = $params['serialized_name_list'];
+        $classAttributeNameList = $params['name_list'];
 
         $classAttribute = $class->fetchAttributeByIdentifier( $classAttributeIdentifier );
 
@@ -475,9 +475,9 @@ class eZCreateClass extends eZXMLInstallerHandler
             return false;
         }
 
+        $classAttribute->NameList = $classAttributeNameList;
         $classAttribute->setAttribute( 'data_type_string',  $params['data_type_string']  );
         $classAttribute->setAttribute( 'identifier', $classAttributeIdentifier  );
-        $classAttribute->setAttribute( 'serialized_name_list', $classAttributeName  );
         $classAttribute->setAttribute( 'is_required', $params['is_required']  );
         $classAttribute->setAttribute( 'is_searchable', $params['is_searchable']  );
         $classAttribute->setAttribute( 'can_translate', $params['can_translate']  );
