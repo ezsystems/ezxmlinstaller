@@ -245,7 +245,7 @@ class eZCreateClass extends eZXMLInstallerHandler
                 $params['content']                  = '';
                 $params['placement']                = $attributePlacement;
                 $params['is_information_collector'] = $attributeIsInformationCollector;
-                $params['datatype-parameter']       = $attributeDatatypeParameterNode;
+                $params['datatype-parameter']       = $this->parseAndReplaceNodeStringReferences( $attributeDatatypeParameterNode );
                 $params['attribute-node']           = $classAttributeNode;
 
                 if ( !array_key_exists( $attributeIdentifier, $classDataMap ) )

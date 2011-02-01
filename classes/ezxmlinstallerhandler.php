@@ -147,6 +147,43 @@ class eZXMLInstallerHandler
         return $string;
     }
 
+    /**
+     * Browses node to replace any string references in subnodes or attributes
+     *
+     * @since 0.1.5
+     * @param DOMNode 	$node	node to inspect
+     * @return DOMNode	Node with replaced string references
+     */
+    function parseAndReplaceNodeStringReferences( DOMNode $node )
+    {
+        $attrs = $node->attributes;
+        foreach ( $attrs as $attr )
+        {
+            $node->setAttribute( $attr->name, $this->getReferenceID( $attr->value ) );
+        }
+
+        $children = $node->childNodes;
+        foreach ( $children as $child )
+        {
+            switch ( $child->nodeType )
+            {
+                case XML_TEXT_NODE:
+                    $child->textContent = $this->parseAndReplaceStringReferences( $child->textContent );
+                    break;
+
+                case XML_CDATA_SECTION_NODE:
+                    $child->replaceData( $this->parseAndReplaceStringReferences( $child->data ) );
+                    break;
+
+                case XML_ELEMENT_NODE:
+                    $child = $this->parseAndReplaceNodeStringReferences($child);
+                    break;
+            }
+        }
+
+        return $node;
+    }
+
     function settings( )
     {
         return $this->Settings;
