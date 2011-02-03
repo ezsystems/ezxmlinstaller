@@ -67,30 +67,33 @@ class eZCreateClass extends eZXMLInstallerHandler
             $classGroupsNode        = $class->getElementsByTagName( 'Groups' )->item( 0 );
             $classAttributesNode    = $class->getElementsByTagName( 'Attributes' )->item( 0 );
 
+            $nameList = array();
             $nameListObject = $class->getElementsByTagName( 'Names' )->item( 0 );
-            if ( $nameListObject->hasAttributes() )
+            if ( $nameListObject->parentNode === $class && $nameListObject->hasAttributes() )
             {
-                if ( $nameListObject->hasAttributes())
+                print 'found names';
+                $attributes = $nameListObject->attributes;
+                if ( !is_null($attributes) )
                 {
-                    $attributes = $nameListObject->attributes;
-                    if ( !is_null($attributes) )
+                    foreach ( $attributes as $index=>$attr )
                     {
-                        $nameList = array();
-                        foreach ( $attributes as $index=>$attr )
+                        if ( in_array( $attr->name, $availableLanguageList ) )
                         {
-                            if ( in_array( $attr->name, $availableLanguageList ) )
-                            {
-                                $nameList[$attr->name] = $attr->value;
-                            }
+                            $nameList[$attr->name] = $attr->value;
                         }
                     }
                 }
             }
 
-
-            $classNameList = new eZContentClassNameList( serialize($nameList) );
-            $classNameList->validate( );
-
+            if( !empty( $nameList ) )
+            {
+                $classNameList = new eZContentClassNameList( serialize($nameList) );
+                $classNameList->validate( );
+            }
+            else
+            {
+                $classNameList = null;
+            }
 
             $dateTime = time();
             $classCreated = $dateTime;
@@ -302,7 +305,7 @@ class eZCreateClass extends eZXMLInstallerHandler
                 }
             }
 
-            $classNameList->store( $class );
+            if( $classNameList ) $classNameList->store( $class );
 
 
             // add class to a class group
