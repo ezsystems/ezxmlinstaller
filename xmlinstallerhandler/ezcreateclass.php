@@ -123,9 +123,9 @@ class eZCreateClass extends eZXMLInstallerHandler
                         $class->setAttribute( 'is_container', $classIsContainer );
                         $class->setAttribute( 'url_alias_name', $classURLAliasPattern );
 
-                        $class->set();
+                        //$class->set();
                         $class->store();
-                        /* TODO: Remove all attributes */
+                        $class->removeAttributes();
                     } break;
                     case 'new':
                     {
