@@ -36,7 +36,7 @@ class eZFeatureSelectType extends eZDataType
     */
     function eZFeatureSelectType()
     {
-        $this->eZDataType( self::DATA_TYPE_STRING, ezi18n( 'ezxmlinstaller/datatypes', 'Feature Select', 'Datatype name' ),
+        $this->eZDataType( self::DATA_TYPE_STRING, ezpI18n::tr( 'ezxmlinstaller/datatypes', 'Feature Select', 'Datatype name' ),
                            array( 'serialize_supported' => true,
                                   'object_serialize_map' => array( 'data_text' => 'text' ) ) );
     }
@@ -292,7 +292,7 @@ class eZFeatureSelectType extends eZDataType
     */
     function sortKey( $contentObjectAttribute )
     {
-        //include_once( 'lib/ezi18n/classes/ezchartransform.php' );
+        //include_once( 'lib/ezpI18n::tr/classes/ezchartransform.php' );
         $trans = eZCharTransform::instance();
         return $trans->transformByGroup( $contentObjectAttribute->attribute( 'data_text' ), 'lowercase' );
     }

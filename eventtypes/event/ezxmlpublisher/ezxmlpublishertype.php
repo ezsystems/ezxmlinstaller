@@ -29,7 +29,7 @@ class eZXMLPublisherType extends eZWorkflowEventType
 {
     public function eZXMLPublisherType()
     {
-        $this->eZWorkflowEventType( 'ezxmlpublisher', ezi18n( 'extension/ezxmkinstaller', 'XML Publisher' ) );
+        $this->eZWorkflowEventType( 'ezxmlpublisher', ezpI18n::tr( 'extension/ezxmkinstaller', 'XML Publisher' ) );
         $this->setTriggerTypes( array( 'content' => array( 'publish' => array( 'after' ) ) ) );
     }
 
