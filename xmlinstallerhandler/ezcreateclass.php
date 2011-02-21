@@ -69,9 +69,8 @@ class eZCreateClass extends eZXMLInstallerHandler
 
             $nameList = array();
             $nameListObject = $class->getElementsByTagName( 'Names' )->item( 0 );
-            if ( $nameListObject->parentNode === $class && $nameListObject->hasAttributes() )
+            if ( $nameListObject && $nameListObject->parentNode === $class && $nameListObject->hasAttributes() )
             {
-                print 'found names';
                 $attributes = $nameListObject->attributes;
                 if ( !is_null($attributes) )
                 {
