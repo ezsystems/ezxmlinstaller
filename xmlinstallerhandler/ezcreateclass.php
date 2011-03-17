@@ -58,7 +58,7 @@ class eZCreateClass extends eZXMLInstallerHandler
 
             $this->writeMessage( "\tClass '$classIdentifier' will be updated.", 'notice' );
 
-            $classURLAliasPattern   = is_object( $class->getAttribute( 'urlAliasPattern' ) ) ? $class->getAttribute( 'urlAliasPattern' ) : null;
+            $classURLAliasPattern   = $class->getAttribute( 'urlAliasPattern' ) ? $class->getAttribute( 'urlAliasPattern' ) : null;
 
             $classIsContainer       = $class->getAttribute( 'isContainer' );
             if ( $classIsContainer !== false )
