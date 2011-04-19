@@ -401,13 +401,15 @@ class eZCreateClass extends eZXMLInstallerHandler
         $canTranslate = isset( $params['can_translate']   ) ? $params['can_translate'] : 0;
         $isRequired   = isset( $params['is_required']   ) ? $params['is_required'] : 0;
         $isSearchable = isset( $params['is_searchable'] ) ? $params['is_searchable'] : 0;
+        $isCollector  = isset( $params['is_information_collector'] ) ? $params['is_information_collector'] : false;
         $attrContent  = isset( $params['content'] )       ? $params['content'] : false;
 
         $attrCreateInfo = array( 'identifier' => $classAttributeIdentifier,
                                     'serialized_name_list' => $classAttributeNameList->serializeNames(),
                                     'can_translate' => $canTranslate,
                                     'is_required' => $isRequired,
-                                    'is_searchable' => $isSearchable );
+                                    'is_searchable' => $isSearchable,
+                                    'is_information_collector' => $isCollector );
         $newAttribute = eZContentClassAttribute::create( $classID, $datatype, $attrCreateInfo  );
 
         $dataType = $newAttribute->dataType();
