@@ -28,6 +28,21 @@ include_once('extension/ezxmlinstaller/classes/ezxmlinstallerhandler.php');
 class eZCreateContent extends eZXMLInstallerHandler
 {
 
+    /**
+     * Priority management modes
+     * Mode can be specified in each CreateContent or Childs node within a "priorityMode" attribute
+     * Available values :
+     * - none : no management at all
+     * - fixed : priority is expected to be specified on each ContentObject node within a "priority" attribute
+     * - auto :  priorities are automatically incremented
+     *
+     * Default is none
+     * @since 0.1.5
+     */
+    const PRIORITY_MODE_NONE = 'none';
+    const PRIORITY_MODE_FIXED = 'fixed';
+    const PRIORITY_MODE_AUTO = 'auto';
+
     function eZCreateContent( )
     {
     }
@@ -54,6 +69,10 @@ class eZCreateContent extends eZXMLInstallerHandler
                 $parentNodeID = 2;
             }
         }
+
+        $priorityMode = $xmlNode->hasAttribute( 'priorityMode' ) ? $xmlNode->getAttribute( 'priorityMode' ) : self::PRIORITY_MODE_NONE;
+        $priorityCounter = 0;
+
         $objectList = $xmlNode->childNodes; //getElementsByTagName( 'ContentObject' );
         foreach ( $objectList as $objectNode )
         {
@@ -69,6 +88,23 @@ class eZCreateContent extends eZXMLInstallerHandler
             $objectInformation['ownerID'] = $objectNode->getAttribute( 'owner' );
             $objectInformation['creatorID'] = $objectNode->getAttribute( 'creator' );
             $objectInformation['attributes'] = array();
+
+            switch( $priorityMode )
+            {
+                case self::PRIORITY_MODE_AUTO:
+                    $objectInformation['priority'] = $priorityCounter;
+                    break;
+
+                case self::PRIORITY_MODE_FIXED:
+                    $objectInformation['priority'] = $objectNode->hasAttribute( 'priority' ) ? intval( $objectNode->getAttribute( 'priority' ) ) : 0;
+                    break;
+
+                case self::PRIORITY_MODE_NONE:
+                default:
+                    $objectInformation['priority'] = 0;
+                    break;
+            }
+
             $attributeObject = $objectNode->getElementsByTagName( 'Attributes' )->item( 0 );
             if ( $attributeObject )
             {
@@ -93,6 +129,11 @@ class eZCreateContent extends eZXMLInstallerHandler
                 }
             }
             $refInfo = $this->createContentObject( $objectInformation );
+
+            if( $refInfo )
+            {
+                $priorityCounter++;
+            }
 
             // $referenceList = $objectNode->getElementsByTagName( 'SetReference' );
             $referenceList = $objectNode->childNodes;
@@ -475,6 +516,11 @@ class eZCreateContent extends eZXMLInstallerHandler
                     $refArray = array( "node_id"   => $newNode->attribute( 'node_id' ),
                                        "name"      => $contentObjectVersion->attribute( 'name' ),
                                        "object_id" => $contentObject->attribute( 'id' ) );
+
+                    if( $objectInformation['priority'] )
+                    {
+                        $this->updateNodePriority( $refArray['node_id'], $objectInformation['priority'] );
+                    }
                 }
             }
             unset($contentObjectVersion);
@@ -482,6 +528,22 @@ class eZCreateContent extends eZXMLInstallerHandler
             return $refArray;
         }
     return false;
+    }
+
+    /**
+     * Updates node priority
+     * @param int $node_id		Node to update
+     * @param int $priority		New priority value
+     * @since 0.1.5
+     */
+    protected function updateNodePriority( $node_id, $priority )
+    {
+        $node = eZContentObjectTreeNode::fetch( $node_id );
+        if( $node )
+        {
+            $node->setAttribute( 'priority', $priority );
+            $node->store();
+        }
     }
 }
 
