@@ -29,7 +29,7 @@ class eZCreateClass extends eZXMLInstallerHandler
 {
     /**
      * Tells execute algorithm to adjust current class's attributes placement if needed
-     *
+     * @since 1.2.1
      * @var boolean
      */
     private $_adjustAttributesPlacement = false;
@@ -503,9 +503,8 @@ class eZCreateClass extends eZXMLInstallerHandler
     /**
      * Updates placement for each attribute in a class instance
      *
-     * @since 0.1.5
+     * @since 1.2.1
      * @param eZContentClass $class class instance to update
-     * @return null
      */
     protected function _adjustClassAttributesPlacement(eZContentClass $class)
     {

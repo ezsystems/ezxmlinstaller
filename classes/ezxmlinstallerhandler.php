@@ -150,7 +150,7 @@ class eZXMLInstallerHandler
     /**
      * Browses node to replace any string references in subnodes or attributes
      *
-     * @since 0.1.5
+     * @since 1.2.1
      * @param DOMNode 	$node	node to inspect
      * @return DOMNode	Node with replaced string references
      */
