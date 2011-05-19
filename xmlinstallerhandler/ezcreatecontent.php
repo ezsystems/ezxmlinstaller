@@ -88,6 +88,8 @@ class eZCreateContent extends eZXMLInstallerHandler
             $objectInformation['ownerID'] = $objectNode->getAttribute( 'owner' );
             $objectInformation['creatorID'] = $objectNode->getAttribute( 'creator' );
             $objectInformation['attributes'] = array();
+            $objectInformation['sort_field'] = $objectNode->hasAttribute( 'sort_field' ) ? $objectNode->getAttribute( 'sort_field' ) : 'path';
+            $objectInformation['sort_order'] = $objectNode->hasAttribute( 'sort_order' ) ? $objectNode->getAttribute( 'sort_order' ) : 'asc';
 
             switch( $priorityMode )
             {
@@ -238,11 +240,17 @@ class eZCreateContent extends eZXMLInstallerHandler
         {
             $db->begin();
             $versionNumber  = $contentObjectVersion->attribute( 'version' );
+
+            $sortField = intval( eZContentObjectTreeNode::sortFieldID( $objectInformation['sort_field'] ) );
+            $sortOrder = strtolower( $objectInformation['sort_order'] ) == 'desc' ? eZContentObjectTreeNode::SORT_ORDER_DESC : eZContentObjectTreeNode::SORT_ORDER_ASC;
+
             $nodeAssignment = eZNodeAssignment::create(
                     array(  'contentobject_id'      => $contentObject->attribute( 'id' ),
                             'contentobject_version' => $versionNumber,
                             'parent_node'           => $objectInformation['parentNode'],
-                            'is_main'               => 1
+                            'is_main'               => 1,
+                            'sort_field'			=> $sortField,
+                            'sort_order'			=> $sortOrder,
                             )
             );
             $nodeAssignment->store();
