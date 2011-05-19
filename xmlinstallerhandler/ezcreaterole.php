@@ -156,7 +156,18 @@ class eZCreateRole extends eZXMLInstallerHandler
 	               $limitationValue = eZSys::ezcrc32( $limitationValue );
                 }
                 break;
-         }
+
+            case 'Section':
+                if( !is_int( $limitationValue ) )
+                {
+                   $section = eZSection::fetchByIdentifier( $limitationValue );
+	               if( $section )
+	               {
+	                   $limitationValue = $section->attribute( 'id' );
+	               }
+                }
+                break;
+        }
 
         return $limitationValue;
     }

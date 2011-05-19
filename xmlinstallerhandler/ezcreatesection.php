@@ -36,10 +36,20 @@ class eZCreateSection extends eZXMLInstallerHandler
     {
         // ezcontentnavigationpart
         $sectionName    = $xmlNode->getAttribute( 'sectionName' );
+        $sectionIdentifier    = $xmlNode->getAttribute( 'sectionIdentifier' );
         $navigationPart = $xmlNode->getAttribute( 'navigationPart' );
         $referenceID    = $xmlNode->getAttribute( 'referenceID' );
 
-        $sectionID = $this->sectionIDbyName( $sectionName );
+        if( $sectionIdentifier )
+        {
+            $sectionID = eZSection::fetchByIdentifier( $sectionIdentifier );
+        }
+
+        if( !$sectionID )
+        {
+            $sectionID = $this->sectionIDbyName( $sectionName );
+        }
+
         if( $sectionID )
         {
             $this->writeMessage( "\tSection '$sectionName' already exists." , 'notice' );
@@ -48,6 +58,7 @@ class eZCreateSection extends eZXMLInstallerHandler
         {
             $section = new eZSection( array() );
             $section->setAttribute( 'name', $sectionName );
+            $section->setAttribute( 'identifier', $sectionIdentifier );
             $section->setAttribute( 'navigation_part_identifier', $navigationPart );
             $section->store();
             $sectionID = $section->attribute( 'id' );
