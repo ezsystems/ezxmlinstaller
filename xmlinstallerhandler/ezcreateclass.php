@@ -424,21 +424,6 @@ class eZCreateClass extends eZXMLInstallerHandler
         $newAttribute->sync();
 
 
-        // not all datatype can have 'default_value'. do check here.
-        if( $defaultValue !== false  )
-        {
-            switch( $datatype )
-            {
-                case 'ezboolean':
-                {
-                    $newAttribute->setAttribute( 'data_int3', $defaultValue );
-                }
-                break;
-
-                default:
-                    break;
-            }
-        }
 
         if( $attrContent )
             $newAttribute->setContent( $attrContent );
