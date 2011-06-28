@@ -299,13 +299,21 @@ class eZCreateContent extends eZXMLInstallerHandler
                             {
                                 $content = $attributesContent['content'];
                             }
-                            $xml = '<?xml version="1.0" encoding="utf-8"?>'."\n".
-                                    '<section xmlns:image="http://ez.no/namespaces/ezpublish3/image/"'."\n".
-                                    '         xmlns:xhtml="http://ez.no/namespaces/ezpublish3/xhtml/"'."\n".
-                                    '         xmlns:custom="http://ez.no/namespaces/ezpublish3/custom/">'."\n".
-                                    '  <section>'."\n";
-                            $xml .= '    <paragraph>' . $content . "</paragraph>\n";
-                            $xml .= "  </section>\n</section>\n";
+
+                            if( array_key_exists( 'fullxml', $attributesContent ) && $attributesContent['fullxml'] == "true" )
+                            {
+                                $xml = $content;
+                            }
+                            else
+                            {
+                                $xml = '<?xml version="1.0" encoding="utf-8"?>'."\n".
+                                        '<section xmlns:image="http://ez.no/namespaces/ezpublish3/image/"'."\n".
+                                        '         xmlns:xhtml="http://ez.no/namespaces/ezpublish3/xhtml/"'."\n".
+                                        '         xmlns:custom="http://ez.no/namespaces/ezpublish3/custom/">'."\n".
+                                        '  <section>'."\n";
+                                $xml .= '    <paragraph>' . $content . "</paragraph>\n";
+                                $xml .= "  </section>\n</section>\n";
+                            }
 
                             $attribute->setAttribute( 'data_text', $xml );
                         } break;
