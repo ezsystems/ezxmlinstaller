@@ -148,7 +148,7 @@ class eZXMLInstallerHandler
     }
 
     /**
-     * Browses node to replace any string references in subnodes or attributes
+     * Browses $node to replace any string references in subnodes or attributes
      *
      * @since 1.2.1
      * @param DOMNode 	$node	node to inspect

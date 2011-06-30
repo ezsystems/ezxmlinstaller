@@ -125,7 +125,6 @@ class eZCreateClass extends eZXMLInstallerHandler
                         $class->setAttribute( 'is_container', $classIsContainer );
                         $class->setAttribute( 'url_alias_name', $classURLAliasPattern );
 
-                        //$class->set();
                         $class->store();
                         $class->removeAttributes();
                     } break;
@@ -238,7 +237,7 @@ class eZCreateClass extends eZXMLInstallerHandler
 
                 $params = array();
                 $params['identifier']               = $attributeIdentifier;
-                $params['name_list']     = $classAttributeNameList;
+                $params['name_list']                = $classAttributeNameList;
                 $params['data_type_string']         = $attributeDatatype;
                 $params['default_value']            = '';
                 $params['can_translate']            = $attributeIsTranslatable;

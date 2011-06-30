@@ -547,9 +547,9 @@ class eZCreateContent extends eZXMLInstallerHandler
     }
 
     /**
-     * Updates node priority
-     * @param int $node_id		Node to update
-     * @param int $priority		New priority value
+     * Updates the priority for node $node_id to $priority
+     * @param int $node_id
+     * @param int $priority
      * @since 1.2.1
      */
     protected function updateNodePriority( $node_id, $priority )
