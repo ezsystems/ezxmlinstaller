@@ -130,6 +130,25 @@ class eZCreateContent extends eZXMLInstallerHandler
                     }
                 }
             }
+
+            $relationNodes = $objectNode->getElementsByTagName( 'Relation' );
+            if( $relationNodes->length )
+            {
+                $objectInformation['relations'] = array();
+                foreach ( $relationNodes as $relationNode )
+                {
+                    $targetRef = $relationNode->getAttribute( 'target' );
+                    if( $targetRef )
+                    {
+                        $objectInformation['relations'][] = $this->getReferenceID( $targetRef );
+                    }
+                    else
+                    {
+                        $this->writeMessage( 'Warning : No target defined for object relation' );
+                    }
+                }
+            }
+
             $refInfo = $this->createContentObject( $objectInformation );
 
             if( $refInfo )
@@ -514,6 +533,14 @@ class eZCreateContent extends eZXMLInstallerHandler
             if ( isset($objectInformation['ownerID']) && $objectInformation['ownerID'] != '' && $objectInformation['ownerID'] != 0 )
             {
                 $contentObject->setAttribute( 'owner_id',  $objectInformation['ownerID'] );
+            }
+
+            if( isset( $objectInformation['relations'] ) && is_array( $objectInformation['relations'] ) )
+            {
+                foreach( $objectInformation['relations'] as $toObjectID )
+                {
+                    $contentObject->addContentObjectRelation( $toObjectID );
+                }
             }
 
             $contentObjectVersion->store();
