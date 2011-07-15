@@ -32,7 +32,7 @@ class eZCreateClass extends eZXMLInstallerHandler
      * @since 1.2.1
      * @var boolean
      */
-    private $_adjustAttributesPlacement = false;
+    private $adjustAttributesPlacement = false;
 
     function eZCreateClass( )
     {
@@ -45,7 +45,7 @@ class eZCreateClass extends eZXMLInstallerHandler
         $availableLanguageList = eZContentLanguage::fetchLocaleList();
         foreach ( $classList as $class )
         {
-            $this->_adjustAttributesPlacement = false;
+            $this->adjustAttributesPlacement = false;
 
             $user = eZUser::currentUser();
             $userID = $user->attribute( 'contentobject_id' );
@@ -262,11 +262,11 @@ class eZCreateClass extends eZXMLInstallerHandler
                 }
             }
 
-            if( $this->_adjustAttributesPlacement )
+            if( $this->adjustAttributesPlacement )
             {
                 //once every attribute has been processed, we may reset placement
                 $this->writeMessage( "\t\tAdjusting attributes placement.", 'notice' );
-                $this->_adjustClassAttributesPlacement($class);
+                $this->adjustClassAttributesPlacement($class);
             }
 
             if ( count( $updateAttributeList ) )
@@ -441,7 +441,7 @@ class eZCreateClass extends eZXMLInstallerHandler
         $placement = $params['placement'] ? intval( $params['placement'] ) : count( $attributes );
         $newAttribute->setAttribute( 'placement',  $placement);
 
-        $this->_adjustAttributesPlacement = true;
+        $this->adjustAttributesPlacement = true;
 
         $newAttribute->storeDefined();
         $classAttributeID = $newAttribute->attribute( 'id' );
@@ -474,7 +474,7 @@ class eZCreateClass extends eZXMLInstallerHandler
         if( $params['placement'] )
         {
             $classAttribute->setAttribute( 'placement', $params['placement'] );
-            $this->_adjustAttributesPlacement = true;
+            $this->adjustAttributesPlacement = true;
         }
 
         $dataType = $classAttribute->dataType();
@@ -490,7 +490,7 @@ class eZCreateClass extends eZXMLInstallerHandler
      * @since 1.2.1
      * @param eZContentClass $class class instance to update
      */
-    protected function _adjustClassAttributesPlacement(eZContentClass $class)
+    protected function adjustClassAttributesPlacement(eZContentClass $class)
     {
         $attributes = $class->fetchAttributes();
         $class->adjustAttributePlacements( $attributes );
