@@ -132,10 +132,13 @@ class eZCreateRole extends eZXMLInstallerHandler
         {
             case 'Class':
             case 'ParentClass':
-                $class = eZContentClass::fetchByIdentifier( $limitationValue );
-                if( $class )
+                if( !is_int( $limitationValue ) )
                 {
-                    $limitationValue = $class->ID;
+                    $class = eZContentClass::fetchByIdentifier( $limitationValue );
+                    if( $class )
+                    {
+                        $limitationValue = $class->ID;
+                    }
                 }
                 break;
 
