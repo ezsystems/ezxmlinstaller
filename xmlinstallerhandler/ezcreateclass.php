@@ -27,6 +27,12 @@ include_once('extension/ezxmlinstaller/classes/ezxmlinstallerhandler.php');
 
 class eZCreateClass extends eZXMLInstallerHandler
 {
+    /**
+     * Tells execute algorithm to adjust current class's attributes placement if needed
+     * @since 1.2.1
+     * @var boolean
+     */
+    private $adjustAttributesPlacement = false;
 
     function eZCreateClass( )
     {
@@ -39,6 +45,8 @@ class eZCreateClass extends eZXMLInstallerHandler
         $availableLanguageList = eZContentLanguage::fetchLocaleList();
         foreach ( $classList as $class )
         {
+            $this->adjustAttributesPlacement = false;
+
             $user = eZUser::currentUser();
             $userID = $user->attribute( 'contentobject_id' );
 
@@ -50,7 +58,7 @@ class eZCreateClass extends eZXMLInstallerHandler
 
             $this->writeMessage( "\tClass '$classIdentifier' will be updated.", 'notice' );
 
-            $classURLAliasPattern   = is_object( $class->getAttribute( 'urlAliasPattern' ) ) ? $class->getAttribute( 'urlAliasPattern' ) : null;
+            $classURLAliasPattern   = $class->getAttribute( 'urlAliasPattern' ) ? $class->getAttribute( 'urlAliasPattern' ) : null;
 
             $classIsContainer       = $class->getAttribute( 'isContainer' );
             if ( $classIsContainer !== false )
@@ -59,30 +67,32 @@ class eZCreateClass extends eZXMLInstallerHandler
             $classGroupsNode        = $class->getElementsByTagName( 'Groups' )->item( 0 );
             $classAttributesNode    = $class->getElementsByTagName( 'Attributes' )->item( 0 );
 
+            $nameList = array();
             $nameListObject = $class->getElementsByTagName( 'Names' )->item( 0 );
-            if ( $nameListObject->hasAttributes() )
+            if ( $nameListObject && $nameListObject->parentNode === $class && $nameListObject->hasAttributes() )
             {
-                if ( $nameListObject->hasAttributes())
+                $attributes = $nameListObject->attributes;
+                if ( !is_null($attributes) )
                 {
-                    $attributes = $nameListObject->attributes;
-                    if ( !is_null($attributes) )
+                    foreach ( $attributes as $index=>$attr )
                     {
-                        $nameList = array();
-                        foreach ( $attributes as $index=>$attr )
+                        if ( in_array( $attr->name, $availableLanguageList ) )
                         {
-                            if ( in_array( $attr->name, $availableLanguageList ) )
-                            {
-                                $nameList[$attr->name] = $attr->value;
-                            }
+                            $nameList[$attr->name] = $attr->value;
                         }
                     }
                 }
             }
 
-
-            $classNameList = new eZContentClassNameList( serialize($nameList) );
-            $classNameList->validate( );
-
+            if( !empty( $nameList ) )
+            {
+                $classNameList = new eZContentClassNameList( serialize($nameList) );
+                $classNameList->validate( );
+            }
+            else
+            {
+                $classNameList = null;
+            }
 
             $dateTime = time();
             $classCreated = $dateTime;
@@ -115,9 +125,8 @@ class eZCreateClass extends eZXMLInstallerHandler
                         $class->setAttribute( 'is_container', $classIsContainer );
                         $class->setAttribute( 'url_alias_name', $classURLAliasPattern );
 
-                        $class->set();
                         $class->store();
-                        /* TODO: Remove all attributes */
+                        $class->removeAttributes();
                     } break;
                     case 'new':
                     {
@@ -228,7 +237,7 @@ class eZCreateClass extends eZXMLInstallerHandler
 
                 $params = array();
                 $params['identifier']               = $attributeIdentifier;
-                $params['serialized_name_list']     = $classAttributeNameList->serializeNames();
+                $params['name_list']                = $classAttributeNameList;
                 $params['data_type_string']         = $attributeDatatype;
                 $params['default_value']            = '';
                 $params['can_translate']            = $attributeIsTranslatable;
@@ -237,7 +246,7 @@ class eZCreateClass extends eZXMLInstallerHandler
                 $params['content']                  = '';
                 $params['placement']                = $attributePlacement;
                 $params['is_information_collector'] = $attributeIsInformationCollector;
-                $params['datatype-parameter']       = $attributeDatatypeParameterNode;
+                $params['datatype-parameter']       = $this->parseAndReplaceNodeStringReferences( $attributeDatatypeParameterNode );
                 $params['attribute-node']           = $classAttributeNode;
 
                 if ( !array_key_exists( $attributeIdentifier, $classDataMap ) )
@@ -251,6 +260,13 @@ class eZCreateClass extends eZXMLInstallerHandler
                     $this->writeMessage( "\t\tClass '$classIdentifier' will get updated Attribute '$attributeIdentifier'.", 'notice' );
                     $this->updateClassAttribute( $class, $params );
                 }
+            }
+
+            if( $this->adjustAttributesPlacement )
+            {
+                //once every attribute has been processed, we may reset placement
+                $this->writeMessage( "\t\tAdjusting attributes placement.", 'notice' );
+                $this->adjustClassAttributesPlacement($class);
             }
 
             if ( count( $updateAttributeList ) )
@@ -287,7 +303,7 @@ class eZCreateClass extends eZXMLInstallerHandler
                 }
             }
 
-            $classNameList->store( $class );
+            if( $classNameList ) $classNameList->store( $class );
 
 
             // add class to a class group
@@ -329,15 +345,15 @@ class eZCreateClass extends eZXMLInstallerHandler
 //     function removeClassAttribute( $params )
 //     {
 //         //include_once( 'kernel/classes/ezcontentclassattribute.php' );
-// 
+//
 //         $contentClassID = $params['class_id'];
 //         $classAttributeIdentifier = $params['attribute_identifier'];
-// 
+//
 //         // get attributes of 'temporary' version as well
 //         $classAttributeList = eZContentClassAttribute::fetchFilteredList( array( 'contentclass_id' => $contentClassID,
 //                                                                                   'identifier' => $classAttributeIdentifier ),
 //                                                                            true );
-// 
+//
 //         $validation = array();
 //         foreach( $classAttributeList as $classAttribute )
 //         {
@@ -350,7 +366,7 @@ class eZCreateClass extends eZXMLInstallerHandler
 //                     $objectAttributeID = $objectAttribute->attribute( 'id' );
 //                     $objectAttribute->removeThis( $objectAttributeID );
 //                 }
-// 
+//
 //                 $classAttribute->removeThis();
 //             }
 //             else
@@ -358,18 +374,18 @@ class eZCreateClass extends eZXMLInstallerHandler
 //                 $removeInfo = $dataType->classAttributeRemovableInformation( $classAttribute );
 //                 if( $removeInfo === false )
 //                     $removeInfo = "Unknow reason";
-// 
+//
 //                 $validation[] = array( 'id' => $classAttribute->attribute( 'id' ),
 //                                        'identifier' => $classAttribute->attribute( 'identifier' ),
 //                                        'reason' => $removeInfo );
 //             }
 //         }
-// 
+//
 //         if( count( $validation ) > 0 )
 //         {
 //             $this->reportError( $validation, 'eZSiteInstaller::removeClassAttribute: Unable to remove eZClassAttribute(s)' );
 //         }
-// 
+//
 //     }
 
     function addClassAttribute( $class, $params )
@@ -377,20 +393,22 @@ class eZCreateClass extends eZXMLInstallerHandler
         $classID = $class->attribute( 'id' );
 
         $classAttributeIdentifier = $params['identifier'];
-        $classAttributeName = $params['serialized_name_list'];
+        $classAttributeNameList = $params['name_list'];
 
         $datatype = $params['data_type_string'];
         $defaultValue = isset( $params['default_value'] ) ? $params['default_value'] : false;
         $canTranslate = isset( $params['can_translate']   ) ? $params['can_translate'] : 0;
         $isRequired   = isset( $params['is_required']   ) ? $params['is_required'] : 0;
         $isSearchable = isset( $params['is_searchable'] ) ? $params['is_searchable'] : 0;
+        $isCollector  = isset( $params['is_information_collector'] ) ? $params['is_information_collector'] : false;
         $attrContent  = isset( $params['content'] )       ? $params['content'] : false;
 
         $attrCreateInfo = array( 'identifier' => $classAttributeIdentifier,
-                                    'serialized_name_list' => $classAttributeName,
+                                    'serialized_name_list' => $classAttributeNameList->serializeNames(),
                                     'can_translate' => $canTranslate,
                                     'is_required' => $isRequired,
-                                    'is_searchable' => $isSearchable );
+                                    'is_searchable' => $isSearchable,
+                                    'is_information_collector' => $isCollector );
         $newAttribute = eZContentClassAttribute::create( $classID, $datatype, $attrCreateInfo  );
 
         $dataType = $newAttribute->dataType();
@@ -405,21 +423,6 @@ class eZCreateClass extends eZXMLInstallerHandler
         $newAttribute->sync();
 
 
-        // not all datatype can have 'default_value'. do check here.
-        if( $defaultValue !== false  )
-        {
-            switch( $datatype )
-            {
-                case 'ezboolean':
-                {
-                    $newAttribute->setAttribute( 'data_int3', $defaultValue );
-                }
-                break;
-
-                default:
-                    break;
-            }
-        }
 
         if( $attrContent )
             $newAttribute->setContent( $attrContent );
@@ -435,13 +438,12 @@ class eZCreateClass extends eZXMLInstallerHandler
         }
 
         $newAttribute->setAttribute( 'version', eZContentClass::VERSION_STATUS_DEFINED );
-        $newAttribute->setAttribute( 'placement', count( $attributes ) );
+        $placement = $params['placement'] ? intval( $params['placement'] ) : count( $attributes );
+        $newAttribute->setAttribute( 'placement',  $placement);
 
-        $class->adjustAttributePlacements( $attributes );
-        foreach( $attributes as $attribute )
-        {
-            $attribute->storeDefined();
-        }
+        $this->adjustAttributesPlacement = true;
+
+        $newAttribute->storeDefined();
         $classAttributeID = $newAttribute->attribute( 'id' );
         return $classAttributeID;
     }
@@ -451,7 +453,7 @@ class eZCreateClass extends eZXMLInstallerHandler
         $classID = $class->attribute( 'id' );
 
         $classAttributeIdentifier = $params['identifier'];
-        $classAttributeName = $params['serialized_name_list'];
+        $classAttributeNameList = $params['name_list'];
 
         $classAttribute = $class->fetchAttributeByIdentifier( $classAttributeIdentifier );
 
@@ -461,13 +463,19 @@ class eZCreateClass extends eZXMLInstallerHandler
             return false;
         }
 
+        $classAttribute->NameList = $classAttributeNameList;
         $classAttribute->setAttribute( 'data_type_string',  $params['data_type_string']  );
         $classAttribute->setAttribute( 'identifier', $classAttributeIdentifier  );
-        $classAttribute->setAttribute( 'serialized_name_list', $classAttributeName  );
         $classAttribute->setAttribute( 'is_required', $params['is_required']  );
         $classAttribute->setAttribute( 'is_searchable', $params['is_searchable']  );
         $classAttribute->setAttribute( 'can_translate', $params['can_translate']  );
         $classAttribute->setAttribute( 'is_information_collector', $params['is_information_collector']  );
+
+        if( $params['placement'] )
+        {
+            $classAttribute->setAttribute( 'placement', $params['placement'] );
+            $this->adjustAttributesPlacement = true;
+        }
 
         $dataType = $classAttribute->dataType();
         $dataType->unserializeContentClassAttribute( $classAttribute, $params['attribute-node'], $params['datatype-parameter'] );
@@ -476,7 +484,21 @@ class eZCreateClass extends eZXMLInstallerHandler
 
     }
 
-
+    /**
+     * Updates placement for each attribute in a class instance
+     *
+     * @since 1.2.1
+     * @param eZContentClass $class class instance to update
+     */
+    protected function adjustClassAttributesPlacement(eZContentClass $class)
+    {
+        $attributes = $class->fetchAttributes();
+        $class->adjustAttributePlacements( $attributes );
+        foreach( $attributes as $attribute )
+        {
+            $attribute->store();
+        }
+    }
 }
 
 ?>
