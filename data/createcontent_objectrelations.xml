@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<eZXMLImporter xmlns="http://ez.no/URI/xmlinstaller/0.1.5">
+	<CreateContent>
+		<ContentObject contentClass="article">
+			<Attributes>
+			 <title>Linked Article</title>
+			</Attributes>
+			<SetReference attribute="object_id" value="linked_article"></SetReference>
+		</ContentObject>
+        <ContentObject contentClass="article">
+            <Attributes>
+             <title>Article linking to previous one and Home</title>
+            </Attributes>
+            <Relation target="internal:linked_article" />
+            <Relation target="1" />
+        </ContentObject>
+	</CreateContent>
+</eZXMLImporter>
