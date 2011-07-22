@@ -37,6 +37,7 @@ class eZAddLocation extends eZXMLInstallerHandler
         $xmlObjectID = $xmlNode->getAttribute( 'contentObject' );
         $xmlParentNodeID = $xmlNode->getAttribute( 'addToNode' );
         $setReferenceID = $xmlNode->getAttribute( 'setReference' );
+        $priority = $xmlNode->getAttribute( 'priority' );
 
         $objectID = $this->getReferenceID( $xmlObjectID );
         $parentNodeID = $this->getReferenceID( $xmlParentNodeID );
@@ -100,6 +101,7 @@ class eZAddLocation extends eZXMLInstallerHandler
         $db = eZDB::instance();
         $db->begin();
         $locationAdded = false;
+        $destNode = null;
         if ( !in_array( $parentNodeID, $parentNodeIDArray ) )
         {
             $parentNodeObject = $parentNode->attribute( 'object' );
@@ -126,24 +128,26 @@ class eZAddLocation extends eZXMLInstallerHandler
             }
             $this->writeMessage( "\tAdded location of " . $object->attribute( 'name' ) . "  to Node $parentNodeID", 'notice' );
 
-            if( $setReferenceID )
-            {
-                $this->addReference( array( $setReferenceID => $insertedNode->attribute( 'node_id' ) ) );
-            }
+            $destNode = $insertedNode;
         }
         else
         {
             $this->writeMessage( "\tLocation of " . $object->attribute( 'name' ) . "  to Node $parentNodeID already exists.", 'notice' );
-            if( $setReferenceID )
-            {
-                $existingNode = eZContentObjectTreeNode::fetchObject( eZContentObjectTreeNode::definition(), null, array( 'parent_node_id' => $parentNodeID, 'contentobject_id' => $objectID ) );
-                if( $existingNode )
-                {
-                    $this->addReference( array( $setReferenceID => $existingNode->attribute( 'node_id' ) ) );
-                }
-            }
+
+            $destNode = eZContentObjectTreeNode::fetchObject( eZContentObjectTreeNode::definition(), null, array( 'parent_node_id' => $parentNodeID, 'contentobject_id' => $objectID ) );
         }
         $db->commit();
+
+        if( $destNode && $priority )
+        {
+            $destNode->setAttribute( 'priority', $priority );
+            $destNode->store();
+        }
+
+        if( $destNode && $setReferenceID )
+        {
+            $this->addReference( array( $setReferenceID => $destNode->attribute( 'node_id' ) ) );
+        }
 
         eZContentCacheManager::clearContentCacheIfNeeded( $objectID );
     }
