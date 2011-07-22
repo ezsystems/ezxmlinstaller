@@ -36,7 +36,7 @@ class eZAddLocation extends eZXMLInstallerHandler
     {
         $xmlObjectID = $xmlNode->getAttribute( 'contentObject' );
         $xmlParentNodeID = $xmlNode->getAttribute( 'addToNode' );
-
+        $setReferenceID = $xmlNode->getAttribute( 'setReference' );
 
         $objectID = $this->getReferenceID( $xmlObjectID );
         $parentNodeID = $this->getReferenceID( $xmlParentNodeID );
@@ -125,10 +125,23 @@ class eZAddLocation extends eZXMLInstallerHandler
                 eZUser::cleanupCache();
             }
             $this->writeMessage( "\tAdded location of " . $object->attribute( 'name' ) . "  to Node $parentNodeID", 'notice' );
+
+            if( $setReferenceID )
+            {
+                $this->addReference( array( $setReferenceID => $insertedNode->attribute( 'node_id' ) ) );
+            }
         }
         else
         {
             $this->writeMessage( "\tLocation of " . $object->attribute( 'name' ) . "  to Node $parentNodeID already exists.", 'notice' );
+            if( $setReferenceID )
+            {
+                $existingNode = eZContentObjectTreeNode::fetchObject( eZContentObjectTreeNode::definition(), null, array( 'parent_node_id' => $parentNodeID, 'contentobject_id' => $objectID ) );
+                if( $existingNode )
+                {
+                    $this->addReference( array( $setReferenceID => $existingNode->attribute( 'node_id' ) ) );
+                }
+            }
         }
         $db->commit();
 
