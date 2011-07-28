@@ -66,6 +66,13 @@ class eZCreateClass extends eZXMLInstallerHandler
 
             $classGroupsNode        = $class->getElementsByTagName( 'Groups' )->item( 0 );
             $classAttributesNode    = $class->getElementsByTagName( 'Attributes' )->item( 0 );
+			$deleteAttributeNodes   = $class->getElementsByTagName( 'DeleteAttribute' );
+			$attributesToDelete = array();
+			foreach( $deleteAttributeNodes as $deleteAttributeNode )
+			{
+				$attributesToDelete[] = $deleteAttributeNode->getAttribute( 'identifier' );
+			}
+
 
             $nameList = array();
             $nameListObject = $class->getElementsByTagName( 'Names' )->item( 0 );
@@ -148,7 +155,30 @@ class eZCreateClass extends eZXMLInstallerHandler
                         $class->setAttribute( 'identifier', $classIdentifier );
                         $class->setAttribute( 'is_container', $classIsContainer );
                         $class->setAttribute( 'url_alias_name', $classURLAliasPattern );
+
+                        if( !empty( $attributesToDelete ) )
+                        {
+
+
+                        	$db = eZDB::instance();
+            				$db->begin();
+
+                        	foreach( $attributesToDelete as $attributeIdentifier )
+							{
+								$classAttribute = $class->fetchAttributeByIdentifier( $attributeIdentifier );
+								if( $classAttribute )
+								{
+									$this->adjustAttributesPlacement = true;
+									$this->writeMessage( "\t\t\tAttribute '$attributeIdentifier' will be deleted.", 'notice' );
+									$classAttribute->removeThis();
+								}
+							}
+
+							$db->commit();
+                        }
+
                         $class->store();
+
                     } break;
                     case 'skip':
                     default:
