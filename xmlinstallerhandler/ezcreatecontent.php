@@ -91,6 +91,16 @@ class eZCreateContent extends eZXMLInstallerHandler
             $objectInformation['sort_field'] = $objectNode->hasAttribute( 'sort_field' ) ? $objectNode->getAttribute( 'sort_field' ) : 'path';
             $objectInformation['sort_order'] = $objectNode->hasAttribute( 'sort_order' ) ? $objectNode->getAttribute( 'sort_order' ) : 'asc';
 
+                //new objects should inherit their parent's section
+            if( !$objectInformation['sectionID'] )
+            {
+                $parentNode = eZContentObjectTreeNode::fetch( $parentNodeID );
+                if( $parentNode )
+                {
+                    $objectInformation['sectionID'] = $parentNode->object()->attribute( 'section_id' );
+                }
+            }
+
             switch( $priorityMode )
             {
                 case self::PRIORITY_MODE_AUTO:
