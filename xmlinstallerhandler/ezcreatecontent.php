@@ -91,15 +91,9 @@ class eZCreateContent extends eZXMLInstallerHandler
             $objectInformation['sort_field'] = $objectNode->hasAttribute( 'sort_field' ) ? $objectNode->getAttribute( 'sort_field' ) : 'path';
             $objectInformation['sort_order'] = $objectNode->hasAttribute( 'sort_order' ) ? $objectNode->getAttribute( 'sort_order' ) : 'asc';
 
-                //new objects should inherit their parent's section
-            if( !$objectInformation['sectionID'] || !( eZSection::fetch( $objectInformation['sectionID'] instanceof eZSection ) ) )
-            {
-                $parentNode = eZContentObjectTreeNode::fetch( $parentNodeID );
-                if( $parentNode )
-                {
-                    $objectInformation['sectionID'] = $parentNode->object()->attribute( 'section_id' );
-                }
-            }
+
+            $objectInformation['sectionID'] = $this->getValidSectionID( $objectInformation['sectionID'], $parentNodeID );
+
 
             switch( $priorityMode )
             {
@@ -205,6 +199,7 @@ class eZCreateContent extends eZXMLInstallerHandler
 //         $objectList = $xmlNode->getElementsByTagName( 'ContentObject' );
 
     }
+
 
     function createContentObject( $objectInformation )
     {
@@ -597,6 +592,40 @@ class eZCreateContent extends eZXMLInstallerHandler
             $node->setAttribute( 'priority', $priority );
             $node->store();
         }
+    }
+
+    /**
+     * Checks wether $sectionID is valid and if not falls back to parent node's
+     * @param int $sectionID
+     * @param int $parentNodeID
+     * @return int The valid SectionID
+     */
+    protected function getValidSectionID( $sectionID, $parentNodeID )
+    {
+            //checking sectionID validity
+        if( $sectionID )
+        {
+            $section = eZSection::fetch( $sectionID );
+
+            if( !( $section instanceof eZSection ) )
+            {
+                $sectionID = null;
+                $this->writeMessage( $sectionID . ' is not a valid section ID, falling back to parent\'s', 'warning' );
+            }
+        }
+
+            //new objects should inherit their parent's section
+        if( !$sectionID )
+        {
+            $parentNode = eZContentObjectTreeNode::fetch( $parentNodeID );
+            if( $parentNode )
+            {
+                return $parentNode->object()->attribute( 'section_id' );
+            }
+        }
+
+            //unlikely case where parentNodeID is invalid too : standard section ID
+        return 1;
     }
 }
 
