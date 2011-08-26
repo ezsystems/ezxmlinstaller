@@ -602,7 +602,6 @@ class eZCreateContent extends eZXMLInstallerHandler
      */
     protected function getValidSectionID( $sectionID, $parentNodeID )
     {
-            //checking sectionID validity
         if( $sectionID )
         {
             $section = eZSection::fetch( $sectionID );
@@ -620,12 +619,17 @@ class eZCreateContent extends eZXMLInstallerHandler
             $parentNode = eZContentObjectTreeNode::fetch( $parentNodeID );
             if( $parentNode )
             {
-                return $parentNode->object()->attribute( 'section_id' );
+                $sectionID = $parentNode->object()->attribute( 'section_id' );
             }
         }
 
-            //unlikely case where parentNodeID is invalid too : standard section ID
-        return 1;
+            //you never know, final fallback to standard section
+        if( !$sectionID )
+        {
+            $sectionID = 1;
+        }
+
+        return $sectionID;
     }
 }
 
