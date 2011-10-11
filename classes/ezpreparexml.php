@@ -24,7 +24,6 @@
 //
 
 require_once( 'autoload.php' );
-require_once( 'kernel/common/template.php' );
 
 if ( !function_exists( 'readline' ) )
 {
@@ -45,7 +44,7 @@ class eZPrepareXML
     function prepareXMLFromTemplate( $templateName, $cli = false )
     {
         $template = 'design:' . $templateName . '.tpl';
-        $tpl      = templateInit();
+        $tpl = eZTemplate::factory();
 
         $tpl->setVariable( 'tpl_info', false );
 
