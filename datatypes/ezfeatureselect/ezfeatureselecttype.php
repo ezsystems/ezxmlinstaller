@@ -217,7 +217,6 @@ class eZFeatureSelectType extends eZDataType
         $templateLocation = $classAttribute->attribute( self::TEMPLATE_LOCATION_FIELD );
         $template = 'design:' . $templateLocation;
         $attrContent = array();
-        include_once( 'kernel/common/template.php' );
         $tpl = eZTemplate::factory();
         $tpl->setVariable( 'availible_feature_list', false );
 
