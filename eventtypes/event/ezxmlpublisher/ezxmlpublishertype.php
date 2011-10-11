@@ -185,7 +185,7 @@ class eZXMLPublisherType extends eZWorkflowEventType
             }
 
             $template = 'design:' . $templateName;
-            $tpl = templateInit();
+            $tpl = eZTemplate::factory();
             $tpl->setVariable( 'tpl_info', false );
 
             $content = $tpl->fetch( $template );

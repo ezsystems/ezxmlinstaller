@@ -38,10 +38,9 @@ class eZSendMail extends eZXMLInstallerHandler
         $receiverID = $xml->getAttribute( 'receiver' );
         $nodeID     = $xml->getAttribute( 'node' );
 
-        include_once( 'kernel/common/template.php' );
         $ini = eZINI::instance();
         $mail = new eZMail();
-        $tpl = templateInit();
+        $tpl = eZTemplate::factory();
 
         $node = eZContentObjectTreeNode::fetch( $nodeID );
         if ( !$node )
