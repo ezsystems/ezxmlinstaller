@@ -49,7 +49,7 @@ class eZCreateSection extends eZXMLInstallerHandler
             }
         }
 
-        if( !$sectionID )
+        if( empty($sectionID) )
         {
             $sectionID = $this->sectionIDbyName( $sectionName );
         }
