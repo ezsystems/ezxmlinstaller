@@ -23,12 +23,10 @@
 //
 //
 
-include_once('extension/ezxmlinstaller/classes/ezxmlinstallerhandler.php');
-
 class eZSendMail extends eZXMLInstallerHandler
 {
 
-    function eZSendMail( )
+    function __construct( )
     {
     }
 

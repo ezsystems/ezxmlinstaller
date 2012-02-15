@@ -23,12 +23,10 @@
 //
 //
 
-include_once('extension/ezxmlinstaller/classes/ezxmlinstallerhandler.php');
-
 class eZAddLocation extends eZXMLInstallerHandler
 {
 
-    function eZAddLocation( )
+    function __construct( )
     {
     }
 

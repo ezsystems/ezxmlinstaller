@@ -23,11 +23,9 @@
 //
 //
 
-include_once('extension/ezxmlinstaller/classes/ezxmlinstallerhandler.php');
-
 class eZCreateWorkflow extends eZXMLInstallerHandler
 {
-    function eZCreateWorkflow( )
+    function __construct( )
     {
     }
 

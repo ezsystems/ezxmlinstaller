@@ -23,19 +23,31 @@
 //
 //
 
-include_once('extension/ezxmlinstaller/classes/ezxmlinstallerhandler.php');
-
 class eZProccessInformation extends eZXMLInstallerHandler
 {
 
-    function eZProccessInformation( )
+    function __construct( )
     {
     }
 
-    function execute( &$xml )
+    function execute( $xml )
     {
         $comment = $xml->getAttribute( 'comment' );
-        $this->writeMessage( "Step " . $this->increaseCouter() . ": " . $comment, 'notice' );
+        $color = $xml->getAttribute( 'color' );
+        $type = $xml->getAttribute( 'type' );
+        if ( ($type == "" || $type == false) && !$color   )
+        {
+            $cli = eZCLI::instance();
+            $type = "notice";
+            $message = "Step " . $this->increaseCouter() . ": ";
+            $message = $cli->stylize( "magenta", $message);
+            $message .= $cli->stylize( "white", $comment );
+        }
+        else
+        {
+            $message = $comment;
+        }
+        $this->writeMessage( $message, $type, $color );
     }
 
     static public function handlerInfo()

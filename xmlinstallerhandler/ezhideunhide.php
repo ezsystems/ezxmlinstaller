@@ -23,12 +23,10 @@
 //
 //
 
-include_once('extension/ezxmlinstaller/classes/ezxmlinstallerhandler.php');
-
 class eZHideUnhide extends eZXMLInstallerHandler
 {
 
-    function eZHideUnhide( )
+    function __construct( )
     {
     }
 
