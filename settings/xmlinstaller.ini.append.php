@@ -1,10 +1,8 @@
 <?php /* #?ini charset="iso-8859-1"?
 
 [XMLInstallerSettings]
-#ExtensionDirectories[]
 ExtensionDirectories[]=ezxmlinstaller
 
-#XMLInstallerHandler[]
 XMLInstallerHandler[]=ezassignroles
 XMLInstallerHandler[]=ezcreatecontent
 XMLInstallerHandler[]=ezsetsettings
@@ -16,6 +14,6 @@ XMLInstallerHandler[]=ezcreaterole
 XMLInstallerHandler[]=ezcreatesection
 XMLInstallerHandler[]=ezcreateworkflow
 XMLInstallerHandler[]=ezsendmail
-XMLInstallerHandler[]=ezmodifycontent
+XMLInstallerHandler[]=ezmovenodes
 
 */?>
