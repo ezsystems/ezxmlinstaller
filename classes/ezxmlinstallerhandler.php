@@ -26,7 +26,7 @@
 class eZXMLInstallerHandler
 {
 
-    function eZXMLInstallerHandler()
+    function __construct()
     {
     }
 
@@ -47,10 +47,10 @@ class eZXMLInstallerHandler
         return array( 'XMLName' => '', 'Info' => '' );
     }
 
-    function writeMessage( $message, $type = 'notice' )
+    function writeMessage( $message, $type = 'notice', $color = false )
     {
         $handlerManager = eZXMLInstallerHandlerManager::instance();
-        $handlerManager->writeMessage( $message, $type = 'notice' );
+        $handlerManager->writeMessage( $message, $type, $color );
     }
 
     function addReference( $refInfo )
