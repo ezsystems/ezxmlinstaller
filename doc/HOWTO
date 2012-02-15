@@ -1,0 +1,32 @@
+= Howto use eZXMLInstaller = 
+
+
+== General purposes ==
+
+== How to use eZXMLInstaller in eZ Publish ==
+
+=== Use as script ===
+
+=== Use as workflow event ===
+
+=== Use the API in a script ===
+
+
+== Handler documentation ==
+
+=== <Handlername> ===
+- purpose
+- syntax
+- example
+- parameter
+
+=== How to implement a custom handler ===
+
+
+== XML exports ==
+
+=== Classes ===
+
+=== Roles ===
+
+
