@@ -1,338 +1,39 @@
 <?xml version = '1.0' encoding = 'ISO-8859-1'?>
-<SiteaccessData
+<eZXMLInstaller
     name="emergency room"
-    abbr="er"
-    url="http://mmc.ez/er">
-    <ImportSettings dataSource="extension/ezhealthcare/data" />
-<!--    <ProccessInformation comment="Content in media sections" />
-    <CreateContent parentNode="43">
-        <ContentObject contentClass="folder" section="1" remoteID="er_folder_image_pool">
+    abbr="ezflow_site_user/"
+    url="http://ez46.localhost"
+    dataSource="extension/ezxmlinstaller/data"
+    defaultParentNode="12">
+    <ProccessInformation comment="Creating content" />
+    <CreateContent parentNode="2" creationMode="overwrite">
+        <ContentObject contentClass="folder" section="1" remoteID="test_folder">
             <Attributes>
-                <title>ER - Folder Image Pool</title>
-                <short_title>ER - Folder Image Pool</short_title>
+                <name>ezxmlinstaller Test Folder</name>
+                <short_name>Test Folder</short_name>
             </Attributes>
-            <SetReference attribute="object_id" value="FOLDER_IMAGE_POOL" />
+            <AdditionalLocation parentNode="71" />
+            <SetReference attribute="object_id" value="TEST_FOLDER" />
+            <SetReference attribute="node_id" value="TEST_FOLDER_NODE" />
         </ContentObject>
-        <ContentObject contentClass="folder" section="1" remoteID="er_article_image_pool">
+        <ContentObject contentClass="folder" section="1" remoteID="test_folder_2" creationMode="newversion">
             <Attributes>
-                <title>ER - Article Image Pool</title>
-                <short_title>ER - Article Image Pool</short_title>
+                <name>xmlinstaller Test Folder 2</name>
+                <short_name>Test Folder 2</short_name>
             </Attributes>
-            <SetReference attribute="object_id" value="ARTICLE_IMAGE_POOL" />
+            <Relation target="internal:TEST_FOLDER" />
+            <AdditionalLocation parentNode="71" />
+            <AdditionalLocation parentNode="internal:TEST_FOLDER_NODE" />
+            <SetReference attribute="object_id" value="TEST_FOLDER2" />
             <Childs>
                 <ContentObject contentClass="image" section="1" remoteID="asdf33">
                     <Attributes>
                         <name>Image 1</name>
-                        <image src="images/34524474.thb.jpg" title="asdf" />
+                        <image src="images/34674783.jpg" title="asdf" />
                     </Attributes>
                     <SetReference attribute="object_id" value="IMAGE_1" />
                 </ContentObject>
             </Childs>
         </ContentObject>
-        <ContentObject contentClass="folder" section="1" remoteID="er_news_image_pool">
-            <Attributes>
-                <title>ER - News Image Pool</title>
-                <short_title>ER - News Image Pool</short_title>
-            </Attributes>
-            <SetReference attribute="object_id" value="NEWS_IMAGE_POOL" />
-        </ContentObject>
     </CreateContent>
-    <ProccessInformation comment="Content in content section" />
-    <CreateContent parentNode="2">
-        <ContentObject contentClass="frontpage" section="1" remoteID="asdf1919">
-            <Attributes>
-                <title>Emergency room</title>
-                <short_title>ER</short_title>
-                <banner>internal:IMAGE_1</banner>
-                <spotlight1_title>my spotlight</spotlight1_title>
-                <spotlight1_image>internal:IMAGE_1</spotlight1_image>
-            </Attributes>
-            <Childs>
-                <ContentObject contentClass="feedback_form" section="1" remoteID="er_contact_form">
-                    <Attributes>
-                      <title>Get in contact</title>
-                      <short_title>contact</short_title>
-                      <recipient>dis@ez.no</recipient>
-                    </Attributes>
-                    <SetReference attribute="object_id" value="CONTACT_FORM" />
-                </ContentObject>
-                <ContentObject contentClass="section" section="7" remoteID="er_patient_section">
-                    <Attributes>
-                      <title>Patientinformatie</title>
-                      <short_title>patienten</short_title>
-                      <view_mode>0</view_mode>
-                    </Attributes>
-                </ContentObject>
-                <ContentObject contentClass="section" section="8" remoteID="er_visitor_section">
-                    <Attributes>
-                      <title>Visitorinformatie</title>
-                      <short_title>visitors</short_title>
-                      <view_mode>0</view_mode>
-                    </Attributes>
-                </ContentObject>
-                <ContentObject contentClass="section" section="9" remoteID="er_professional_section">
-                    <Attributes>
-                      <title>Professionalinformatie</title>
-                      <short_title>professionals</short_title>
-                      <view_mode>0</view_mode>
-                    </Attributes>
-                </ContentObject>
-                <ContentObject contentClass="section" section="1" remoteID="er_over_section">
-                    <Attributes>
-                      <title>Over ER</title>
-                      <short_title>over er</short_title>
-                      <view_mode>0</view_mode>
-                    </Attributes>
-                </ContentObject>
-                <ContentObject contentClass="metadata" section="1" remoteID="er_metadata">
-                    <Attributes>
-                      <title>Metadata</title>
-                      <description>MMC ER division</description>
-                      <author>er@mmc.nl</author>
-                      <copyright>(c)2007 MMC</copyright>
-                      <keywords>er,emergency,room,emergency room</keywords>
-                    </Attributes>
-                </ContentObject>
-                <ContentObject contentClass="template_look" section="1" remoteID="er_pagelayout">
-                    <Attributes>
-                      <title>Pagelayout</title>
-                      <page_title>ER - emergency room</page_title>
-                      <site_url url="http://schroeder-rockt.de" title="ER!" />
-                      <image src="images/logo.png" title="ER - emergency room" />
-                      <footer_text>(c)2007 - emergency room</footer_text>
-                      <contact_form>internal:CONTACT_FORM</contact_form>
-                      <disclaimer>object_id:208</disclaimer>
-                      <colofon>object_id:209</colofon>
-                      <folder_image_pool>internal:FOLDER_IMAGE_POOL</folder_image_pool>
-                      <article_image_pool>internal:ARTICLE_IMAGE_POOL</article_image_pool>
-                      <news_image_pool>internal:NEWS_IMAGE_POOL</news_image_pool>
-                    </Attributes>
-                </ContentObject>
-            </Childs>
-            <SetReference attribute="node_id" value="FRONTEND_NODE_ID" />
-        </ContentObject>
-    </CreateContent>-->
-    <ProccessInformation comment="Adding siteaccess settings" />
-    <SetSettings>
-      <SettingsFile name="site.ini" location="settings/siteaccess/er_user_dut">
-        <SettingsBlock name="ExtensionSettings">
-            <ActiveAccessExtensions>
-              <value></value>
-              <value>ezdndsort</value>
-              <value>mmc_design</value>
-              <value>ezdhtml</value>
-              <value>ezlabel</value>
-              <value>mmc_general_gyn_settings</value>
-              <value>ezarchivecontent</value>
-              <value>lucene</value>
-            </ActiveAccessExtensions>
-        </SettingsBlock>
-        <SettingsBlock name="SiteSettings">
-            <IndexPage>/content/view/full/[internal:FRONTEND_NODE_ID]/</IndexPage>
-            <DefaultPage>/content/view/full/[internal:FRONTEND_NODE_ID]/</DefaultPage>
-        </SettingsBlock>
-        <SettingsBlock name="SiteAccessSettings">
-            <RequireUserLogin>false</RequireUserLogin>
-            <ShowHiddenNodes>false</ShowHiddenNodes>
-            <PathPrefix>gynocology</PathPrefix>
-        </SettingsBlock>
-        <SettingsBlock name="DesignSettings">
-            <SiteDesign>mmc</SiteDesign>
-            <AdditionalSiteDesignList>
-                <value>base</value>
-            </AdditionalSiteDesignList>
-        </SettingsBlock>
-        <SettingsBlock name="RegionalSettings">
-            <Locale>dut-NL</Locale>
-            <ContentObjectLocale>dut-NL</ContentObjectLocale>
-            <SiteLanguageList>
-              <value></value>
-              <value>dut-NL</value>
-            </SiteLanguageList>
-            <TextTranslation>enabled</TextTranslation>
-        </SettingsBlock>
-      </SettingsFile>
-      <SettingsFile name="content.ini" location="settings/siteaccess/er_user_dut">
-        <SettingsBlock name="ArchiveSettings">
-            <RootNodeList>
-              <value></value>
-              <value>401</value>
-            </RootNodeList>
-            <ArchiveRootFolder>447</ArchiveRootFolder>
-        </SettingsBlock>
-      </SettingsFile>
-      <SettingsFile name="contentstructuremenu.ini" location="settings/siteaccess/er_user_dut">
-        <SettingsBlock name="TreeMenu">
-            <MaxDepth>2</MaxDepth>
-        </SettingsBlock>
-      </SettingsFile>
-      <SettingsFile name="healthcare.ini" location="settings/siteaccess/er_user_dut">
-        <SettingsBlock name="SiteSettings">
-            <SiteRootNode>37sssss2</SiteRootNode>
-            <SiteDesignObject>4526</SiteDesignObject>
-            <SiteBannerPool_Folder>202</SiteBannerPool_Folder>
-            <SiteBannerPool_Article>176</SiteBannerPool_Article>
-        </SettingsBlock>
-        <SettingsBlock name="PoolSettings_section">
-            <SiteDesignObject_spotlight1_image>folder_image_pool</SiteDesignObject_spotlight1_image>
-            <SiteDesignObject_spotlight2_image>folder_image_pool</SiteDesignObject_spotlight2_image>
-            <SiteDesignObject_spotlight3_image>folder_image_pool</SiteDesignObject_spotlight3_image>
-        </SettingsBlock>
-        <SettingsBlock name="PoolSettings_folder">
-            <SiteDesignObject_spotlight1_image>folder_image_pool</SiteDesignObject_spotlight1_image>
-            <SiteDesignObject_spotlight2_image>folder_image_pool</SiteDesignObject_spotlight2_image>
-            <SiteDesignObject_spotlight3_image>folder_image_pool</SiteDesignObject_spotlight3_image>
-        </SettingsBlock>
-        <SettingsBlock name="PoolSettings_article">
-            <SiteDesignObject_image>article_image_pool</SiteDesignObject_image>
-        </SettingsBlock>
-        <SettingsBlock name="PoolSettings_news_article">
-            <SiteDesignObject_image>news_image_pool</SiteDesignObject_image>
-        </SettingsBlock>
-        <SettingsBlock name="PoolSettings_employee_folder">
-            <SiteDesignObject_image>article_image_pool</SiteDesignObject_image>
-        </SettingsBlock>
-        <SettingsBlock name="PoolSettings_news_folder">
-            <SiteDesignObject_image>news_image_pool</SiteDesignObject_image>
-        </SettingsBlock>
-        <SettingsBlock name="PoolSettings_frontpage">
-            <SiteDesignObject_spotlight1_image>folder_image_pool</SiteDesignObject_spotlight1_image>
-            <SiteDesignObject_spotlight2_image>folder_image_pool</SiteDesignObject_spotlight2_image>
-            <SiteDesignObject_spotlight3_image>folder_image_pool</SiteDesignObject_spotlight3_image>
-        </SettingsBlock>
-      </SettingsFile>
-    </SetSettings>
-    <ProccessInformation comment="Adding global settings" />
-    <SetSettings>
-      <SettingsFile name="site.ini" location="settings/override">
-        <SettingsBlock name="SiteAccessSettings">
-            <RelatedSiteAccessList>
-              <value>meeee_user_dut</value>
-            </RelatedSiteAccessList>
-        </SettingsBlock>
-      </SettingsFile>
-    </SetSettings>
-<!--    <ProccessInformation comment="Content in user section" />
-    <CreateContent parentNode="257">
-        <ContentObject contentClass="user_group" section="2" remoteID="er_content_manager_group">
-            <Attributes>
-                <name>ER</name>
-                <website_toolbar_access>1</website_toolbar_access>
-            </Attributes>
-            <SetReference attribute="object_id" value="CONTENT_MANAGER_GROUP" />
-            <Childs>
-                <ContentObject contentClass="user" section="2" remoteID="er_content_manager_testuser">
-                    <Attributes>
-                        <first_name>Test</first_name>
-                        <last_name>User</last_name>
-                        <user_account login="er_test_user" email="no_spamm@ez.no" password="publish" />
-                    </Attributes>
-                </ContentObject>
-            </Childs>
-        </ContentObject>
-    </CreateContent>
-    <ProccessInformation comment="Assigning roles to user groups" />
-    <AssignRoles>
-         <RoleAssignment roleID="" assignTo="" sectionLimitation="" subtreeLimitation="" /> 
-        <RoleAssignment roleID="6"  assignTo="internal:CONTENT_MANAGER_GROUP" subtreeLimitation="internal:FRONTEND_NODE_ID" />
-        <RoleAssignment roleID="8"  assignTo="internal:CONTENT_MANAGER_GROUP" subtreeLimitation="internal:FRONTEND_NODE_ID" />
-        <RoleAssignment roleID="10" assignTo="internal:CONTENT_MANAGER_GROUP" subtreeLimitation="internal:FRONTEND_NODE_ID" />
-        <RoleAssignment roleID="12" assignTo="internal:CONTENT_MANAGER_GROUP" subtreeLimitation="internal:FRONTEND_NODE_ID" />
-        <RoleAssignment roleID="20" assignTo="internal:CONTENT_MANAGER_GROUP" subtreeLimitation="internal:FRONTEND_NODE_ID" />
-        <RoleAssignment roleID="23" assignTo="internal:CONTENT_MANAGER_GROUP" subtreeLimitation="internal:FRONTEND_NODE_ID" />
-    </AssignRoles>-->
-</SiteaccessData>
-
-
-
-
-<!--                <ContentObject contentClass="image" section="1" remoteID="asdf44">
-                    <Attributes>
-                        <name>Image 2</name>
-                        <image src="images/34524485.thb.jpg" title="sdf" />
-                    </Attributes>
-                </ContentObject>
-                <ContentObject contentClass="image" section="1" remoteID="asdf55">
-                    <Attributes>
-                        <name>Image 3</name>
-                        <image src="images/34524501.thb.jpg" title="dhg" />
-                    </Attributes>
-                </ContentObject>
-                <ContentObject contentClass="image" section="1" remoteID="asdf66">
-                    <Attributes>
-                        <name>Image 4</name>
-                        <image src="images/34524522.thb.jpg" title="fghj" />
-                    </Attributes>
-                </ContentObject>
-                <ContentObject contentClass="image" section="1" remoteID="asdf77">
-                    <Attributes>
-                        <name>Image 5</name>
-                        <image src="images/34524526.thb.jpg" title="asdf" />
-                    </Attributes>
-                </ContentObject>
-                <ContentObject contentClass="image" section="1" remoteID="asdf88">
-                    <Attributes>
-                        <name>Image 6</name>
-                        <image src="images/34525705.thb.jpg" title="sdfg" />
-                    </Attributes>
-                </ContentObject>
-                <ContentObject contentClass="image" section="1" remoteID="asdf99">
-                    <Attributes>
-                        <name>Image 7</name>
-                        <image src="images/34526218.thb.jpg" title="dfh" />
-                    </Attributes>
-                </ContentObject>
-                <ContentObject contentClass="image" section="1" remoteID="asdf1010">
-                    <Attributes>
-                        <name>Image 8</name>
-                        <image src="images/34526223.thb.jpg" title="fghj" />
-                    </Attributes>
-                </ContentObject>
-                <ContentObject contentClass="image" section="1" remoteID="asdf1111">
-                    <Attributes>
-                        <name>Image 9</name>
-                        <image src="images/34527636.thb.jpg" title="qew" />
-                    </Attributes>
-                </ContentObject>
-                <ContentObject contentClass="image" section="1" remoteID="asdf1212">
-                    <Attributes>
-                        <name>Image 10</name>
-                        <image src="images/34590440.thb.jpg" title="asdf" />
-                    </Attributes>
-                </ContentObject>
-                <ContentObject contentClass="image" section="1" remoteID="asdf1313">
-                    <Attributes>
-                        <name>Image 11</name>
-                        <image src="images/34674783.thb.jpg" title="asdfqwe" />
-                    </Attributes>
-                </ContentObject>
-                <ContentObject contentClass="image" section="1" remoteID="asdf1414">
-                    <Attributes>
-                        <name>Image 12</name>
-                        <image src="images/35318969.thb.jpg" title="" />
-                    </Attributes>
-                </ContentObject>
-                <ContentObject contentClass="image" section="1" remoteID="asdf1515">
-                    <Attributes>
-                        <name>Image 13</name>
-                        <image src="images/37468150.thb.jpg" title="" />
-                    </Attributes>
-                </ContentObject>
-                <ContentObject contentClass="image" section="1" remoteID="asdf1616">
-                    <Attributes>
-                        <name>Image 14</name>
-                        <image src="images/37468215.thb.jpg" title="" />
-                    </Attributes>
-                </ContentObject>
-                <ContentObject contentClass="image" section="1" remoteID="asdf1717">
-                    <Attributes>
-                        <name>Image 15</name>
-                        <image src="images/37468501.thb.jpg" title="" />
-                    </Attributes>
-                </ContentObject>
-                <ContentObject contentClass="image" section="1" remoteID="asdf1818">
-                    <Attributes>
-                        <name>Image 16</name>
-                        <image src="images/37468553.thb.jpg" title="" />
-                    </Attributes>
-                </ContentObject>-->
+</eZXMLInstaller>
