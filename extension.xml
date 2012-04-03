@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<software>
+    <metadata>
+        <name>eZ XML Installer</name>
+        <version>//autogentag//</version>
+        <copyright>Copyright (C) 1999-2012 eZ Systems AS</copyright>
+        <license>//EZP_LICENSE//</license>
+        <info_url>http://projects.ez.no/ezxmlinstaller</info_url>
+    </metadata>
+</software>
