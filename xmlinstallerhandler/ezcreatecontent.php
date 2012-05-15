@@ -487,7 +487,7 @@ class eZCreateContent extends eZXMLInstallerHandler
 
                         case 'ezbinaryfile':
                         {
-                            $filePath = $XMLInstallerINI->variable( "DataSettings", "FileDirectory" ).$attributesContent['src'];
+                            $filePath = $this->setting( 'data_source' ) . '/' . $attributesContent['src'];
                             $fileName = $attributesContent['title'];
                             $path = realpath( $filePath );
                             if ( file_exists( $path ) )
