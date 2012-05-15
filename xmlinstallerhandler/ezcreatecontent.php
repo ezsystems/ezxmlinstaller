@@ -485,9 +485,23 @@ class eZCreateContent extends eZXMLInstallerHandler
                             }
                         } break;
 
+                        case 'ezbinaryfile':
+                        {
+                            $filePath = $XMLInstallerINI->variable( "DataSettings", "FileDirectory" ).$attributesContent['src'];
+                            $fileName = $attributesContent['title'];
+                            $path = realpath( $filePath );
+                            if ( file_exists( $path ) )
+                            {
+								$eZBinaryFileType = new eZBinaryFileType();
+								$eZBinaryFileType->fromString( $attribute, $path );
+                            }
+                            else
+                            {
+                                $this->writeMessage( "\tFile " . $path . " not found.", 'warning' );
+                            }
+                        } break;
 
                         case 'ezauthor':
-                        case 'ezbinaryfile':
                         case 'ezcountry':
                         case 'ezdate':
                         case 'ezdatetime':
