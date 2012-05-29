@@ -35,6 +35,7 @@ $tpl->setVariable( "role_count", count( $list ) );
 
 
 $result = $tpl->fetch( 'design:xmlexport/roles.tpl' );
+$result = ltrim(preg_replace('/<!--(.|\s)*?-->/', '', $result));
 
 $doc = new DOMDocument;
 $doc->loadXML( $result );
