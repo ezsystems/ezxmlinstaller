@@ -111,6 +111,7 @@ class eZXMLInstallerHandlerManager
 
     function writeMessage( $message, $type = 'notice', $color = false )
     {
+        $message = str_replace("\t", "  ", $message);
         if ( isset( $_SERVER['argv'] ) )
         {
             $cli = eZCLI::instance();
@@ -122,13 +123,20 @@ class eZXMLInstallerHandlerManager
             {
                 case 'debug':
                 {
-                    $message = $cli->stylize( "gray", $message);
+                    $message = $cli->stylize( "dark-white", $message);
                     $cli->notice( $message );
                 } break;
                 case 'notice':
                 {
+                    $message = $cli->stylize( "gray", $message);
                     $cli->notice( $message );
                 } break;
+                case 'success':
+                {
+                    $message = $cli->stylize( "green", $message);
+                    $cli->notice( $message );
+                } break;
+                case 'warn':
                 case 'warning':
                 {
                     $message = $cli->stylize( "yellow", $message);
