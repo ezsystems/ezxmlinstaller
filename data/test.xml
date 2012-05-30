@@ -1,4 +1,4 @@
-<?xml version = '1.0' encoding = 'ISO-8859-1'?>
+<?xml version = '1.0' encoding="utf-8"?>
 <eZXMLInstaller
     name="emergency room"
     abbr="ezflow_site_user/"
@@ -6,20 +6,20 @@
     dataSource="extension/ezxmlinstaller/data"
     defaultParentNode="12">
     <ProccessInformation comment="Creating content" />
-    <CreateContent parentNode="2" creationMode="overwrite">
+    <CreateContent parentNode="2" creationMode="newobject">
         <ContentObject contentClass="folder" section="1" remoteID="test_folder">
             <Attributes>
                 <name>ezxmlinstaller Test Folder</name>
-                <short_name>Test Folder</short_name>
+                <short_name>Test Földer</short_name>
             </Attributes>
             <AdditionalLocation parentNode="71" />
             <SetReference attribute="object_id" value="TEST_FOLDER" />
             <SetReference attribute="node_id" value="TEST_FOLDER_NODE" />
         </ContentObject>
-        <ContentObject contentClass="folder" section="1" remoteID="test_folder_2" creationMode="newversion">
+<!--        <ContentObject contentClass="folder" section="1" remoteID="test_folder_2" creationMode="newversion">
             <Attributes>
-                <name>xmlinstaller Test Folder 2</name>
-                <short_name>Test Folder 2</short_name>
+                <name editMode="skip">xmlinstaller Test Folder 2</name>
+                <short_name editMode="change">asdTest Folder 2</short_name>
             </Attributes>
             <Relation target="internal:TEST_FOLDER" />
             <AdditionalLocation parentNode="71" />
@@ -28,12 +28,17 @@
             <Childs>
                 <ContentObject contentClass="image" section="1" remoteID="asdf33">
                     <Attributes>
-                        <name>Image 1</name>
+                        <name>Imagä 2</name>
+                        <image editMode="remove" src="images/34674783.jpg" title="asdf" />
                         <image src="images/34674783.jpg" title="asdf" />
                     </Attributes>
                     <SetReference attribute="object_id" value="IMAGE_1" />
                 </ContentObject>
             </Childs>
-        </ContentObject>
+        </ContentObject> -->
     </CreateContent>
+    <ProccessInformation comment="Assign state to test folder." />
+    <SetState objectID="internal:TEST_FOLDER" stateIDList="1" />
+    <ProccessInformation comment="Add test folder to media tree." />
+    <AddLocation contentObject="internal:TEST_FOLDER" addToNode="5"/>
 </eZXMLInstaller>
