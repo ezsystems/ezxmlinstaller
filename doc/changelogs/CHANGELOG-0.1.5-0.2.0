@@ -1,0 +1,6 @@
+- Added colored output of console script
+- Merged eZCreateContent and eZModifyContent handler (Removed eZModifyContent)
+- Added option to set current user as script parameter
+- Merged functionallity to set information of datatype and script, templates can now be used for both cases
+- Added more complex input types: boolean, selects and text
+
