@@ -25,7 +25,6 @@
         <input type="text"
                size="70"
                class="ezcc-{$attribute.object.content_class.identifier} ezcca-{$attribute.object.content_class.identifier}_{$attribute.contentclass_attribute_identifier}" 
-               {if $installed_feature_list|contains($key)}checked="checked"{/if}
                name="{$attribute_base}_ezfeatureselect_list_{$attribute.id}[{$key}]"
                value="{$installed_feature_list[$key]|wash()}" />
        {break}
