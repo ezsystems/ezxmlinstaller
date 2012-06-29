@@ -132,13 +132,17 @@ class eZCreateRole extends eZXMLInstallerHandler
         {
             case 'Class':
             case 'ParentClass':
-                if( !is_int( $limitationValue ) )
+                if( !is_numeric( $limitationValue ) )
                 {
                     $class = eZContentClass::fetchByIdentifier( $limitationValue );
                     if( $class )
                     {
                         $limitationValue = $class->ID;
                     }
+                }
+                else
+                {
+                    $limitationValue = intval( $limitationValue );
                 }
                 break;
 
@@ -154,20 +158,28 @@ class eZCreateRole extends eZXMLInstallerHandler
 
             case 'SiteAccess':
                 //siteaccess name must be crc32'd
-                if( !is_int( $limitationValue ) )
+                if( !is_numeric( $limitationValue ) )
                 {
 	               $limitationValue = eZSys::ezcrc32( $limitationValue );
+                }
+                else
+                {
+                    $limitationValue = intval( $limitationValue );
                 }
                 break;
 
             case 'Section':
-                if( !is_int( $limitationValue ) )
+                if( !is_numeric( $limitationValue ) )
                 {
                    $section = eZSection::fetchByIdentifier( $limitationValue );
 	               if( $section )
 	               {
 	                   $limitationValue = $section->attribute( 'id' );
 	               }
+                }
+                else
+                {
+                    $limitationValue = intval( $limitationValue );
                 }
                 break;
         }
