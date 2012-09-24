@@ -23,8 +23,6 @@
 //
 //
 
-require_once 'kernel/common/i18n.php';
-
 class eZXMLPublisherType extends eZWorkflowEventType
 {
     public function eZXMLPublisherType()
