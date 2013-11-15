@@ -484,10 +484,25 @@ class eZCreateContent extends eZXMLInstallerHandler
                                 eZDebug::writeWarning( $attributesContent['content'], "No relation declared" );
                             }
                         } break;
-
+                        
+						case 'ezbinaryfile':
+                        {
+                            $filePath = $this->setting( 'data_source' ) . '/' . $attributesContent['src'];
+							var_dump($filePath);
+                            $fileName = $attributesContent['title'];
+                            $path = realpath( $filePath );
+							var_dump($path);
+                            if ( file_exists( $path ) ) {
+								$eZBinaryFileType = new eZBinaryFileType();
+								$eZBinaryFileType->fromString( $attribute, $path );
+                            }
+                            else
+                            {
+								$this->writeMessage( "\tFile " . $path . " not found.", 'warning' );
+                            }
+                        } break;
 
                         case 'ezauthor':
-                        case 'ezbinaryfile':
                         case 'ezcountry':
                         case 'ezdate':
                         case 'ezdatetime':
