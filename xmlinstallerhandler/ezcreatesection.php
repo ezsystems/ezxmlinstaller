@@ -43,10 +43,14 @@ class eZCreateSection extends eZXMLInstallerHandler
 
         if( $sectionIdentifier )
         {
-            $sectionID = eZSection::fetchByIdentifier( $sectionIdentifier );
+            $section = eZSection::fetchByIdentifier( $sectionIdentifier );
+            if ($section)
+            {
+                $sectionID = $section->attribute( 'id' );
+            }
         }
 
-        if( !$sectionID )
+        if( empty($sectionID) )
         {
             $sectionID = $this->sectionIDbyName( $sectionName );
         }

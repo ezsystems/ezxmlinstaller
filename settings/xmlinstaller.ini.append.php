@@ -17,5 +17,6 @@ XMLInstallerHandler[]=ezcreatesection
 XMLInstallerHandler[]=ezcreateworkflow
 XMLInstallerHandler[]=ezsendmail
 XMLInstallerHandler[]=ezmodifycontent
+XMLInstallerHandler[]=ezmodifyfilecontent
 
 */?>
