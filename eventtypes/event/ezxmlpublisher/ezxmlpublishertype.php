@@ -33,7 +33,6 @@ class eZXMLPublisherType extends eZWorkflowEventType
         }
         else
         {
-            include_once( 'kernel/common/i18n.php' );
             $this->eZWorkflowEventType( 'ezxmlpublisher', ezi18n( 'extension/ezxmkinstaller', 'XML Publisher' ) );
         }
         $this->setTriggerTypes( array( 'content' => array( 'publish' => array( 'after' ) ) ) );
@@ -77,9 +76,11 @@ class eZXMLPublisherType extends eZWorkflowEventType
     {
         $parameters = $process->attribute( 'parameter_list' );
         $object = eZContentObject::fetch( $parameters['object_id'] );
+        $objectVersion = $object->version( $parameters['version'] );
+
         $attribute = false;
 
-        $dataMap = $object->attribute( 'data_map' );
+        $dataMap = $objectVersion->attribute( 'data_map' );
         foreach ( $dataMap as $attr )
         {
             $dataType = $attr->attribute( 'data_type_string' );
@@ -96,137 +97,77 @@ class eZXMLPublisherType extends eZWorkflowEventType
             return eZWorkflowType::STATUS_ACCEPTED;
         }
 
-        // if we have not the first version published, we only need to enable/disable features
-        if ( $object->attribute( 'modified' ) != $object->attribute( 'published' ) )
-        {
-            $attributeContent = $attribute->attribute( 'content' );
-            $installedFeatureList = $attributeContent['installed_feature_list'];
-            $availibleFeatureList = $attributeContent['availible_feature_list'];
-
-            $mainNodeID = $object->attribute( 'main_node_id' );
-
-            foreach( $availibleFeatureList as $feature => $featureName )
-            {
-                $featureObject = eZContentObject::fetchByRemoteID( $mainNodeID . '_' . $feature );
-                if( !$featureObject )
-                {
-                    eZDebug::writeError( "Cannot find feature object", "eZXMLPublisherType::execute" );
-                    continue;
-                }
-                $featureNode = $featureObject->attribute( 'main_node' );
-                if( !$featureNode )
-                {
-                    eZDebug::writeError( "Cannot find feature node", "eZXMLPublisherType::execute" );
-                    continue;
-                }
-                if ( in_array( $feature, $installedFeatureList ) )
-                {
-                    if ( $featureNode->attribute( 'is_hidden' ) )
-                    {
-                        eZContentObjectTreeNode::unhideSubTree( $featureNode );
-                    }
-                    $featureObject = $featureNode->attribute( 'object' );
-                    $list          = $featureObject->reverseRelatedObjectList( false, 0, false,
-                                                                               array( 'AllRelations' => eZContentObject::RELATION_ATTRIBUTE, 'IgnoreVisibility' => true )
-                                                                             );
-                    if ( is_array( $list ) )
-                    {
-                        foreach ( $list as $reverseRelatedContentObject )
-                        {
-                            $reverseRelatedMainNode = $reverseRelatedContentObject->attribute( 'main_node' );
-                            eZContentObjectTreeNode::unhideSubTree( $reverseRelatedMainNode );
-                        }
-                    }
-                }
-                elseif ( !in_array( $feature, $installedFeatureList ) && !$featureNode->attribute( 'is_hidden' ) )
-                {
-                    if ( !$featureNode->attribute( 'is_hidden' ) )
-                    {
-                        eZContentObjectTreeNode::hideSubTree( $featureNode );
-                    }
-                    $featureObject = $featureNode->attribute( 'object' );
-                    $list          = $featureObject->reverseRelatedObjectList( false, 0, false,
-                                                                               array( 'AllRelations' => eZContentObject::RELATION_ATTRIBUTE, 'IgnoreVisibility' => true )
-                                                                             );
-                    if ( is_array( $list ) )
-                    {
-                        foreach ( $list as $reverseRelatedContentObject )
-                        {
-                            $reverseRelatedMainNode = $reverseRelatedContentObject->attribute( 'main_node' );
-                            eZContentObjectTreeNode::hideSubTree( $reverseRelatedMainNode );
-                        }
-                    }
-                }
-            }
-        }
-
         // defer to cron, this is safer because we might do a lot of things here
-        include_once( 'lib/ezutils/classes/ezsys.php' );
         if ( eZSys::isShellExecution() == false )
         {
             return eZWorkflowType::STATUS_DEFERRED_TO_CRON_REPEAT;
         }
 
-        // if we have the first version published, we need to set up the related things.
-        if ( $object->attribute( 'modified' ) == $object->attribute( 'published' ) )
+        $classAttribute = $attribute->attribute( 'contentclass_attribute' );
+        $templateName = $classAttribute->attribute( 'data_text1' );
+
+        $attributeContent = $attribute->attribute( 'content' );
+        $installedFeatureList = $attributeContent['installed_feature_list'];
+        $availibleFeatureList = $attributeContent['availible_feature_list'];
+
+        if( $templateName == '' )
         {
-            $classAttribute = $attribute->attribute( 'contentclass_attribute' );
-            $templateName = $classAttribute->attribute( 'data_text1' );
-
-            $attributeContent = $attribute->attribute( 'content' );
-            $installedFeatureList = $attributeContent['installed_feature_list'];
-            $availibleFeatureList = $attributeContent['availible_feature_list'];
-
-            if( $templateName == '' )
-            {
-                return eZWorkflowType::STATUS_ACCEPTED;
-            }
-
-            $template = 'design:' . $templateName;
-            $tpl = eZTemplate::factory();
-            $tpl->setVariable( 'tpl_info', false );
-
-            $content = $tpl->fetch( $template );
-
-            $tpl->setVariable( 'install_features', $installedFeatureList );
-
-            $userID = $object->attribute( 'owner_id' );
-            $tpl->setVariable( 'owner_object_id', $userID );
-
-            $nodeID = $object->attribute( 'main_node_id' );
-            $tpl->setVariable( 'main_node_id', $nodeID );
-
-
-            $content = $tpl->fetch( $template );
-            $xml = $tpl->variable( "xml_data" );
-
-            $doc = new DOMDocument( '1.0', 'utf-8' );
-            if( !$doc->loadXML( $xml ) )
-            {
-                eZDebug::writeError( "Cannot parse XML", "eZXMLPublisherType::execute" );
-                return eZWorkflowType::STATUS_WORKFLOW_CANCELLED;
-            }
-
-            $xmlInstaller = new eZXMLInstaller( $doc );
-
-            if (! $xmlInstaller->proccessXML() )
-            {
-                eZDebug::writeError( "Cannot proccess XML", "eZXMLPublisherType::execute" );
-                return eZWorkflowType::STATUS_WORKFLOW_CANCELLED;
-            }
-
             return eZWorkflowType::STATUS_ACCEPTED;
         }
-        // otherwise we need only to enable, disable the selected features.
-        else
+
+        $template = 'design:' . $templateName;
+        $tpl = eZTemplate::factory();
+        $tpl->setVariable( 'xmlinstaller_feature_list', false );
+
+        $content = $tpl->fetch( $template );
+        $featureList = $tpl->variable( 'xmlinstaller_feature_list' );
+
+        if ($featureList && is_array($featureList))
         {
+            foreach ($featureList as $key => $feature)
+            {
+                $val = false;
+                if (array_key_exists($key, $installedFeatureList) && $installedFeatureList[$key] != "" && $installedFeatureList[$key] != false )
+                {
+                    $val = $installedFeatureList[$key];
+                }
+                elseif (array_key_exists('default', $feature))
+                {
+                    $val = $feature['default'];
+                }
+                $tpl->setVariable( $key, $val );
+            }
+        }
+       
+        $tpl->setVariable( 'install_features', $installedFeatureList );
+
+        $userID = $object->attribute( 'owner_id' );
+        $tpl->setVariable( 'owner_object_id', $userID );
+
+        $nodeID = $object->attribute( 'main_node_id' );
+        $tpl->setVariable( 'main_node_id', $nodeID );
+
+        $content = $tpl->fetch( $template );
+        $xml = $tpl->variable( "xml_data" );
+
+        $doc = new DOMDocument( '1.0', 'utf-8' );
+        if( !$doc->loadXML( $xml ) )
+        {
+            eZDebug::writeError( "Cannot parse XML", "eZXMLPublisherType::execute" );
+            return eZWorkflowType::STATUS_WORKFLOW_CANCELLED;
         }
 
+        $xmlInstaller = new eZXMLInstaller( $doc );
+
+        if (! $xmlInstaller->proccessXML() )
+        {
+            eZDebug::writeError( "Cannot proccess XML", "eZXMLPublisherType::execute" );
+            return eZWorkflowType::STATUS_WORKFLOW_CANCELLED;
+        }
 
         return eZWorkflowType::STATUS_ACCEPTED;
     }
 }
-
 
 eZWorkflowEventType::registerEventType( 'ezxmlpublisher', 'eZXMLPublisherType' );
 

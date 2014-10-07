@@ -1,0 +1,23 @@
+= TODO list for ezxmlinstaller =
+
+* full documentation
+* upgrade code to work with 4.6
+* out of the box running examples
+* add handler for includes
+* add xmlexport tab to admin interface
+* add xml exports for sections
+* add xml export for single classes
+* add role assignments to role export
+* add out of the box functionallity: archive content
+
+* add content modi: newobject, newversion, override, skip 
+
+
+= Missing Documentation =
+* modify workflow event to process more complex inputs: boolean, selects, text
+  * cli input function
+  * datatype storage
+* add colored output to console
+* script: add option to set current user
+* merge createcontent and modifycontent handler
+

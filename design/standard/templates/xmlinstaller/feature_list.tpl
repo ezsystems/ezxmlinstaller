@@ -1,44 +1,45 @@
-{set $availible_feature_list = hash( 'tasks', 'Task List', 'files', 'Files', 'forum', 'Message Board', 'blog', 'Blog', 'calendar', 'Calendar', 'wiki', 'Wiki' )}
-
-
-
-{*Team Member
-Task list
-Files
-Boxes
-Milestones
-Message Board
-Blog
-Calendar
-Wiki*}
-
-
-
-{set $tpl_info=hash(
-        'sa_name',      hash(   'info',     'Name of siteaccess',
-                                'type',     'string' ),
-
-        'sa_abbr',      hash(   'info',     'Abbr of siteaccess',
-                                'type',     'string' ),
-
-        'sa_url',       hash(   'info',     'URL to siteaccess',
-                                'type',     'string',
-                                'default',  'http://mmc.ez' ),
-
-        'data_source',  hash(   'info',     'Directory to data',
-                                'type',     'string',
-                                'default',  'extension/ezxmlinstaller/data' )
+{set $xmlinstaller_feature_list =   hash( 'files2',       hash( 'type',    'boolean',
+                                                              'info',    'Files 2   ',
+                                                              'default',    'yes' ),
+                                          'tasks',     hash(  'type',    'selection' ,
+                                                              'info',    'Task List',
+                                                              'vars',    hash('var1', 'Var 1', 'caar2', 'Var 2'),
+                                                              'default', 'caar2' ),
+                                         'files',       hash( 'type',    'boolean',
+                                                              'info',    'Files' ),
+                                         'forum',       hash( 'type',    'string',
+                                                              'info',    'Message Board' ),
+                                         'sa_name',     hash( 'info',    'Name of siteaccess',
+                                                              'type',    'string' ),
+                                          'sa_abbr',    hash( 'info',    'Abbr of siteaccess',
+                                                              'type',    'string' ),
+                                         'sa_url',      hash( 'info',    'URL to siteaccess',
+                                                              'type',    'string',
+                                                              'default', 'http://mmc.ez' ),
+                                         'data_source', hash( 'info',    'Directory to data',
+                                                              'type',    'string',
+                                                              'default', 'extension/ezxmlinstaller/data' )
 )}
 {def $site_access_name=concat($sa_abbr,'_user_dut')
      $site_access_dir=concat('settings/siteaccess/',$site_access_name)}
 {set-block variable='xml_data'}
 <?xml version = '1.0' encoding = 'ISO-8859-1'?>
-<eZXMLImporter
+<eZXMLInstaller
     name="{$sa_name}"
     abbr="{$sa_abbr}"
     url="{$sa_url}"
     data_source="{$data_source}">
-    <ProccessInformation comment="Content in media sections" />
+    <ProccessInformation comment="Tasks: {$tasks}" color="cyan" />
+    <ProccessInformation comment="Files 2: {$files2}" color="cyan" />
+    <ProccessInformation comment="Files: {$files}" color="red" type="error" />
+    <ProccessInformation comment="Forum: {$forum}" color="yellow" />
+    <ProccessInformation comment="SA Name: {$sa_name}" color="blue" />
+    <ProccessInformation comment="SA Abbr: {$sa_abbr}" color="cyan" />
+    <ProccessInformation comment="URL: {$sa_url}" color="cyan" />
+    <ProccessInformation comment="Data source: {$data_source}" color="cyan" />
+</eZXMLInstaller>
+
+{*
     <CreateContent parentNode="43">
         <ContentObject contentClass="folder" section="3" remoteID="{$sa_abbr}_folder_image_pool">
             <Attributes>
@@ -71,7 +72,7 @@ Wiki*}
             <SetReference attribute="object_id" value="NEWS_IMAGE_POOL" />
         </ContentObject>
     </CreateContent>
-{*    <ProccessInformation comment="Content in content section" />
+    <ProccessInformation comment="Content in content section" />
     <CreateContent parentNode="2">
         <ContentObject contentClass="frontpage" section="1" remoteID="{$sa_abbr}_frontpage_object">
             <Attributes>
@@ -147,7 +148,7 @@ Wiki*}
             <SetReference attribute="node_id" value="FRONTEND_NODE_ID" />
         </ContentObject>
     </CreateContent>
-*}  <ProccessInformation comment="Content in user section" />
+  <ProccessInformation comment="Content in user section" />
   <CreateContent parentNode="5">
         <ContentObject contentClass="user_group" section="2" remoteID="{$sa_abbr}_content_manager_group">
             <Attributes>
@@ -178,5 +179,6 @@ Wiki*}
     </AssignRoles>
     <ProccessInformation comment="Add location of teamroom leader" />
 <AddLocation contentObject="" addToNode=""/>
-</eZXMLImporter>
+
+*}
 {/set-block}

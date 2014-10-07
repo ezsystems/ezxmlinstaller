@@ -23,7 +23,6 @@
 //
 //
 
-include_once('extension/ezxmlinstaller/classes/ezxmlinstallerhandler.php');
 
 class eZCreateContent extends eZXMLInstallerHandler
 {
@@ -39,12 +38,22 @@ class eZCreateContent extends eZXMLInstallerHandler
      * Default is none
      * @since 1.2.1
      */
-    const PRIORITY_MODE_NONE = 'none';
+    const PRIORITY_MODE_NONE  = 'none';
     const PRIORITY_MODE_FIXED = 'fixed';
-    const PRIORITY_MODE_AUTO = 'auto';
+    const PRIORITY_MODE_AUTO  = 'auto';
 
-    function eZCreateContent( )
+    const EDIT_MODE_SKIP       = 'skip';
+    const EDIT_MODE_NEWVERSION = 'newversion';
+    const EDIT_MODE_NEWOBJECT  = 'newobject';
+    const EDIT_MODE_OVERWRITE  = 'overwrite';
+
+    const ATTR_MODE_SKIP       = 'skip';
+    const ATTR_MODE_CHANGE     = 'change';
+    const ATTR_MODE_REMOVE     = 'remove';
+
+    function __construct( )
     {
+        $this->EditModeList = array( self::EDIT_MODE_SKIP, self::EDIT_MODE_NEWVERSION, self::EDIT_MODE_NEWOBJECT, self::EDIT_MODE_OVERWRITE);
     }
 
     function execute( $xml )
@@ -65,20 +74,41 @@ class eZCreateContent extends eZXMLInstallerHandler
             $parentNodeID = $xmlNode->getAttribute( 'parentNode' );
             if ( !$parentNodeID )
             {
-                $this->writeMessage( "\tNo parent node defined. Using node 2.", 'warning' );
-                $parentNodeID = 2;
+                if ($this->setting( 'defaultParentNode' ))
+                {
+                    $parentNodeID = $this->setting( 'defaultParentNode' );
+                }
+                else
+                {
+                    $parentNodeID = 2;
+                }
+                $this->writeMessage( "\tNo parent node defined. Using node $parentNodeID.", 'warning' );
             }
+        }
+
+        $defautEditMode = $xmlNode->getAttribute( 'creationMode' );
+        if (!in_array($defautEditMode, $this->EditModeList))
+        {
+            $defautEditMode = self::EDIT_MODE_NEWVERSION;
         }
 
         $priorityMode = $xmlNode->hasAttribute( 'priorityMode' ) ? $xmlNode->getAttribute( 'priorityMode' ) : self::PRIORITY_MODE_NONE;
         $priorityCounter = 0;
 
-        $objectList = $xmlNode->childNodes; //getElementsByTagName( 'ContentObject' );
+        $objectList = $xmlNode->childNodes;
         foreach ( $objectList as $objectNode )
         {
             if ( $objectNode->nodeName != 'ContentObject' )
                 continue;
+
+            $editMode = $objectNode->getAttribute( 'creationMode' );
+            if (!in_array($editMode, $this->EditModeList))
+            {
+                $editMode = $defautEditMode;
+            }
+
             $objectInformation = array();
+            $objectInformation['edit_mode'] = $editMode;
             $objectInformation['parentNode'] = $this->getReferenceID($parentNodeID);
 
             $objectInformation['classID'] = $this->getReferenceID( $objectNode->getAttribute( 'contentClass' ) );
@@ -113,6 +143,8 @@ class eZCreateContent extends eZXMLInstallerHandler
                 $attributes = $attributeObject->childNodes;
                 foreach ( $attributes as $attribute )
                 {
+                    if ( $attribute->nodeName == "#text")
+                        continue;
                     $objectInformation['attributes'][$attribute->nodeName] = array();
                     $objectInformation['attributes'][$attribute->nodeName]['content'] = $attribute->textContent;
                     if ( $attribute->hasAttributes() )
@@ -144,7 +176,25 @@ class eZCreateContent extends eZXMLInstallerHandler
                     }
                     else
                     {
-                        $this->writeMessage( 'Warning : No target defined for object relation' );
+                        $this->writeMessage( 'No target defined for object relation', 'warning' );
+                    }
+                }
+            }
+
+            $locationNodes = $objectNode->getElementsByTagName( 'AdditionalLocation' );
+            if( $locationNodes->length )
+            {
+                $objectInformation['locations'] = array();
+                foreach ( $locationNodes as $locationNode )
+                {
+                    $tmpParentNodeID = $locationNode->getAttribute( 'parentNode' );
+                    if( $tmpParentNodeID )
+                    {
+                        $objectInformation['locations'][] = $this->getReferenceID( $tmpParentNodeID );
+                    }
+                    else
+                    {
+                        $this->writeMessage( 'No target defined for object relation', 'warning' );
                     }
                 }
             }
@@ -156,7 +206,6 @@ class eZCreateContent extends eZXMLInstallerHandler
                 $priorityCounter++;
             }
 
-            // $referenceList = $objectNode->getElementsByTagName( 'SetReference' );
             $referenceList = $objectNode->childNodes;
             $refArray = array();
             foreach ( $referenceList as $reference )
@@ -183,7 +232,7 @@ class eZCreateContent extends eZXMLInstallerHandler
             }
             $this->addReference( $refArray );
 
-            $this->writeMessage( "\tCreated: " . $refInfo['name'], 'notice' );
+            $this->writeMessage( "\t\tDone: " . $refInfo['name'], 'notice' );
 
             $childs = $objectNode->getElementsByTagName( 'Childs' )->item( 0 );
             if ( $childs )
@@ -192,12 +241,12 @@ class eZCreateContent extends eZXMLInstallerHandler
             }
             unset( $objectInformation );
         }
-//         $objectList = $xmlNode->getElementsByTagName( 'ContentObject' );
-
     }
 
     function createContentObject( $objectInformation )
     {
+        $this->writeMessage( "\tCreating object [" . $objectInformation['remoteID']."] (" . $objectInformation['classID'] . ").", "notice", "cyan" );
+
         $db = eZDB::instance();
         $contentObjectVersion = false;
         if ( $objectInformation['ownerID'] )
@@ -212,19 +261,54 @@ class eZCreateContent extends eZXMLInstallerHandler
         if ( $objectInformation['remoteID'] )
         {
             $contentObject = eZContentObject::fetchByRemoteId( $objectInformation['remoteID'] );
-            if (  $contentObject )
-            {
-                $this->writeMessage( "\t[".$objectInformation['remoteID']."] Object exists: " . $contentObject->attribute("name") . ". Creating new version.", 'notice' );
-                $contentObjectVersion = $contentObject->createNewVersion();
-            }
         }
         elseif ( $objectInformation['objectID'] )
         {
             $contentObject = eZContentObject::fetch( $objectInformation['objectID'] );
-            if (  $contentObject )
+        }
+
+        if (  $contentObject )
+        {
+            if ($objectInformation['edit_mode'] == self::EDIT_MODE_SKIP)
             {
-                $this->writeMessage( "\t[".$objectInformation['remoteID']."] Object exists: " . $contentObject->attribute("name") . ". Creating new version.", 'notice' );
+                $this->writeMessage( "\t[".$objectInformation['remoteID']."] Object exists: skipping", "notice", "blue" );
+                $newNodeArray = eZContentObjectTreeNode::fetchByContentObjectID( $contentObject->attribute( 'id' ) );
+                $contentObjectVersion = $contentObject->currentVersion();
+                $refArray = false;
+                if ( $newNodeArray && count($newNodeArray) >= 1 )
+                {
+                    $newNode = $newNodeArray[0];
+                    if ( $newNode )
+                    {
+                        $refArray = array( "node_id"   => $newNode->attribute( 'node_id' ),
+                                           "name"      => $contentObjectVersion->attribute( 'name' ),
+                                           "object_id" => $contentObject->attribute( 'id' ) );
+
+                        if( $objectInformation['priority'] )
+                        {
+                            $this->updateNodePriority( $refArray['node_id'], $objectInformation['priority'] );
+                        }
+                    }
+                }
+                unset($contentObjectVersion);
+                unset($contentObject);
+                return $refArray;
+            }
+            elseif ($objectInformation['edit_mode'] == self::EDIT_MODE_NEWVERSION)
+            {
                 $contentObjectVersion = $contentObject->createNewVersion();
+            }
+            elseif ($objectInformation['edit_mode'] == self::EDIT_MODE_NEWOBJECT)
+            {
+                unset($contentObject);
+            }
+            elseif ($objectInformation['edit_mode'] == self::EDIT_MODE_OVERWRITE)
+            {
+                $contentObjectVersion = $contentObject->currentVersion();
+            }
+            else
+            {
+                $this->writeMessage( "\t[".$objectInformation['remoteID']."] No valid edit mode given!", "error" );
             }
         }
 
@@ -249,7 +333,25 @@ class eZCreateContent extends eZXMLInstallerHandler
                 return false;
             }
             $contentObject = $contentClass->instantiate( $userID );
+            
+            if ($objectInformation['edit_mode'] == self::EDIT_MODE_NEWOBJECT)
+            {
+                $origRemoteId = $objectInformation['remoteID'];
+                $counter = 1;
+                do 
+                {
+                    $remoteiD = $origRemoteId . "_" . $counter++;
+                    $tmp = eZContentObject::fetchByRemoteId($remoteiD);
+                    if(!$tmp)
+                    {
+                        $objectInformation['remoteID'] = $remoteiD;
+                        unset($tmp);
+                        break;
+                    } 
+                } while(true);
+            }
             $contentObject->setAttribute( 'remote_id',  $objectInformation['remoteID'] );
+            
             if ( $contentObject )
             {
                 $contentObjectVersion = $contentObject->currentVersion();
@@ -259,10 +361,10 @@ class eZCreateContent extends eZXMLInstallerHandler
         {
             $db->begin();
             $versionNumber  = $contentObjectVersion->attribute( 'version' );
-
             $sortField = intval( eZContentObjectTreeNode::sortFieldID( $objectInformation['sort_field'] ) );
             $sortOrder = strtolower( $objectInformation['sort_order'] ) == 'desc' ? eZContentObjectTreeNode::SORT_ORDER_DESC : eZContentObjectTreeNode::SORT_ORDER_ASC;
 
+            $this->writeMessage( "\t\tSetting location to node [" . $objectInformation['parentNode'] . "].", "notice" );
             $nodeAssignment = eZNodeAssignment::create(
                     array(  'contentobject_id'      => $contentObject->attribute( 'id' ),
                             'contentobject_version' => $versionNumber,
@@ -273,14 +375,83 @@ class eZCreateContent extends eZXMLInstallerHandler
                             )
             );
             $nodeAssignment->store();
+            
+            if ( isset($objectInformation['locations']) && count($objectInformation['locations']) > 0 )
+            {
+                foreach ( $objectInformation['locations'] as $location )
+                {
+                    $this->writeMessage( "\t\tSetting location to node [$location].", "notice" );
+                    $nodeAssignment = eZNodeAssignment::create(
+                            array(  'contentobject_id'      => $contentObject->attribute( 'id' ),
+                                    'contentobject_version' => $versionNumber,
+                                    'parent_node'           => $location,
+                                    'is_main'               => 0,
+                                    'sort_field'			=> $sortField,
+                                    'sort_order'			=> $sortOrder,
+                                    )
+                    );
+                    $nodeAssignment->store();
+                }
+            }
+            
+            
             $dataMap = $contentObjectVersion->dataMap();
             foreach ( $objectInformation['attributes'] as $attributeName => $attributesContent )
             {
+                $editMode = self::ATTR_MODE_CHANGE;
+                
+                if ( isset($attributesContent['editMode']) )
+                {
+                    if ($attributesContent['editMode'] == "remove")
+                    {
+                        $editMode = self::ATTR_MODE_REMOVE;
+                    }
+                    elseif ($attributesContent['editMode'] == "skip")
+                    {
+                        $editMode = self::ATTR_MODE_SKIP;
+                    }
+                    elseif ($attributesContent['editMode'] == "change")
+                    {
+                        $editMode = self::ATTR_MODE_CHANGE;
+                    }
+                }
+
                 if ( array_key_exists( $attributeName, $dataMap ) )
                 {
                     $attribute = $dataMap[$attributeName];
                     $classAttributeID = $attribute->attribute( 'contentclassattribute_id' );
                     $dataType = $attribute->attribute( 'data_type_string' );
+
+                    $this->writeMessage( "\t\tSetting attribute [$attributeName].", "notice" );
+                    $this->writeMessage( "\t\t\tEdit for attribute is $editMode.", "debug" );
+                    if ($attribute->attribute('has_content') && $editMode == self::ATTR_MODE_SKIP)
+                    {
+                        $this->writeMessage( "\t\t\tskipping!.", "notice" );
+                        continue;                   
+                    }
+                    elseif ($editMode == self::ATTR_MODE_REMOVE)
+                    {
+                        $this->writeMessage( "\t\t\tremoving content!.", "notice" );
+                        
+                        switch ( $dataType )
+                        {
+                            case 'ezimage':
+                            {
+                                $content = $attribute->content();
+                                if ( $content )
+                                {
+                                    $content->removeAliases( $attribute );
+                                    $content->store( $attribute );
+                                }
+                            } break;
+                            default:
+                            {
+                                $attribute->fromString("");
+                            }
+                        };
+                        $attribute->store();
+                        continue;                   
+                    }
                     switch ( $dataType )
                     {
                         case 'ezstring':
@@ -344,7 +515,7 @@ class eZCreateContent extends eZXMLInstallerHandler
                         } break;
                         case 'ezimage':
                         {
-                            $imagePath = $this->setting( 'data_source' ) . '/' . $attributesContent['src'];
+                            $imagePath = $this->setting( 'dataSource' ) . '/' . $attributesContent['src'];
                             $imageName = $attributesContent['title'];
                             $path = realpath( $imagePath );
                             if ( file_exists( $path ) )
@@ -519,6 +690,12 @@ class eZCreateContent extends eZXMLInstallerHandler
                     }
                     $attribute->store();
                 }
+                else
+                {
+                    $this->writeMessage( "\t\tAttribute [$attributeName] not found!" , 'error' );
+                
+                }
+                $this->writeMessage( "\t\t\tAttribute [$attributeName] set sucessfully.", "debug" );
             }
             if ( isset($objectInformation['sectionID']) && $objectInformation['sectionID'] != '' && $objectInformation['sectionID'] != 0 )
             {
@@ -539,6 +716,7 @@ class eZCreateContent extends eZXMLInstallerHandler
             {
                 foreach( $objectInformation['relations'] as $toObjectID )
                 {
+                    $this->writeMessage( "\t\tSetting reference to object [" . $toObjectID . "].", "notice" );
                     $contentObject->addContentObjectRelation( $toObjectID );
                 }
             }
@@ -547,7 +725,50 @@ class eZCreateContent extends eZXMLInstallerHandler
             $contentObject->store();
             $db->commit();
 
-            eZOperationHandler::execute( 'content', 'publish', array( 'object_id' => $contentObject->attribute( 'id' ), 'version'   => $versionNumber ) );
+
+            try
+            {
+                $this->writeMessage( "\t\tPublishing object...", "error", "gray" );
+                $behaviour = new ezpContentPublishingBehaviour();
+                $behaviour->isTemporary = true;
+                $behaviour->disableAsynchronousPublishing = false;
+                ezpContentPublishingBehaviour::setBehaviour( $behaviour );
+
+                $operationHandlerResult = eZOperationHandler::execute( 'content', 'publish', array( 'object_id' => $contentObject->attribute( 'id' ), 'version'   => $versionNumber ) );
+
+            }
+            catch (Exception $e)
+            {
+                $operationHandlerResult = -1;
+                $this->writeMessage( "\t\tPublishing object failed!", "error" );
+            }
+
+            if ($operationHandlerResult == -1)
+            {
+                $this->writeMessage( "\t\tPublishing object failed!", "error" );
+            }
+            if (is_array($operationHandlerResult) &&  array_key_exists('status', $operationHandlerResult))
+            {
+                if($operationHandlerResult['status'] == 3)
+                {
+                    $this->writeMessage( "\t\tObject deferred to cron", "warning" );
+                }
+                elseif($operationHandlerResult['status'] == 1)
+                {
+                    $this->writeMessage( "\t\tObject published successfully!", "success" );
+                    $this->writeMessage( "\t\t\tObject ID:    " . $contentObject->attribute('id') , "success" );
+                    $this->writeMessage( "\t\t\tMain Node ID: " . $contentObject->attribute('main_node_id') , "success" );
+                    
+                }
+                else
+                {
+                    $this->writeMessage( "\t\tPublishing return unknown status!", "error" );
+                }
+            }
+            else
+            {
+                $this->writeMessage( "\t\tPublishing return unknown result!", "error" );
+            }
 
             $newNodeArray = eZContentObjectTreeNode::fetchByContentObjectID( $contentObject->attribute( 'id' ) );
             $refArray = false;
@@ -570,7 +791,7 @@ class eZCreateContent extends eZXMLInstallerHandler
             unset($contentObject);
             return $refArray;
         }
-    return false;
+        return false;
     }
 
     /**
@@ -588,6 +809,9 @@ class eZCreateContent extends eZXMLInstallerHandler
             $node->store();
         }
     }
+    
+    var $EditModeList;
+
 }
 
 ?>

@@ -23,12 +23,11 @@
 //
 //
 
-include_once('extension/ezxmlinstaller/classes/ezxmlinstallerhandler.php');
 
 class eZAssignRoles extends eZXMLInstallerHandler
 {
 
-    function eZAssignRoles( )
+    function __construct( )
     {
     }
 

@@ -25,7 +25,6 @@
 
 class eZXMLInstallerHandlerManager
 {
-
     private function __construct()
     {
         $this->HandlerList    = array();
@@ -110,23 +109,42 @@ class eZXMLInstallerHandlerManager
         return $result;
     }
 
-    function writeMessage( $message, $type = 'notice' )
+    function writeMessage( $message, $type = 'notice', $color = false )
     {
+        $message = str_replace("\t", "  ", $message);
         if ( isset( $_SERVER['argv'] ) )
         {
             $cli = eZCLI::instance();
+            if ($color)
+            {
+                $message = $cli->stylize( $color, $message);
+            }
             switch ( $type )
             {
-                case 'notice':
+                case 'debug':
                 {
+                    $message = $cli->stylize( "dark-white", $message);
                     $cli->notice( $message );
                 } break;
+                case 'notice':
+                {
+                    $message = $cli->stylize( "gray", $message);
+                    $cli->notice( $message );
+                } break;
+                case 'success':
+                {
+                    $message = $cli->stylize( "green", $message);
+                    $cli->notice( $message );
+                } break;
+                case 'warn':
                 case 'warning':
                 {
+                    $message = $cli->stylize( "yellow", $message);
                     $cli->warning( $message );
                 } break;
                 case 'error':
                 {
+                    $message = $cli->stylize( "red", $message);
                     $cli->error( $message );
                 } break;
                 default:
@@ -153,7 +171,6 @@ class eZXMLInstallerHandlerManager
     static private $Instance;
 
     var $HandlerList;
-
     var $MessageArray;
     var $ReferenceArray;
     var $Settings;

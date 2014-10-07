@@ -23,12 +23,10 @@
 //
 //
 
-include_once('extension/ezxmlinstaller/classes/ezxmlinstallerhandler.php');
-
 class eZCreateSection extends eZXMLInstallerHandler
 {
 
-    function eZCreateSection( )
+    function __construct( )
     {
     }
 

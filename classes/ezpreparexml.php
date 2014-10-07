@@ -23,8 +23,6 @@
 //
 //
 
-require_once( 'autoload.php' );
-
 if ( !function_exists( 'readline' ) )
 {
     function readline( $prompt = '' )
@@ -37,23 +35,23 @@ if ( !function_exists( 'readline' ) )
 class eZPrepareXML
 {
 
-    function eZPrepareXML( )
+    private function __construct()
     {
     }
 
     function prepareXMLFromTemplate( $templateName, $cli = false )
     {
-        $template = 'design:' . $templateName . '.tpl';
+        $template = 'design:' . $templateName;
         $tpl = eZTemplate::factory();
 
-        $tpl->setVariable( 'tpl_info', false );
+        $tpl->setVariable( 'xmlinstaller_feature_list', false );
 
         $content = $tpl->fetch( $template );
         $tplInfo = false;
 
-        if ( $tpl->variable( "tpl_info" ) !== false )
+        if ( $tpl->variable( "xmlinstaller_feature_list" ) !== false )
         {
-            $tplInfo = $tpl->variable( "tpl_info" );
+            $tplInfo = $tpl->variable( "xmlinstaller_feature_list" );
         }
         if ( is_array( $tplInfo ) )
         {
@@ -72,7 +70,51 @@ class eZPrepareXML
                 {
                     $default = $info['default'];
                 }
-                $value = eZPrepareXML::getUserInput( "Please enter \"" . $query . "\" (" . $default . "): ", $default );
+                $value = "";
+                $question = "Please enter \"" . $query . "\"";
+                if ($default)
+                {
+                    $question .= " (" . $default . ")";
+                }
+                switch($info['type'])
+                {
+                    case "string":
+                    {
+                        $question .= ": ";
+                        $value = eZPrepareXML::getUserInput( $question, $default );
+                    } break;
+                    case "selection":
+                    {
+                        $question .= " [";
+                        $optionList = array();
+                        foreach ($info['vars'] as $k => $v)
+                        {
+                            $optionList[] = $k;
+                            $question .= " $k($v), ";
+                        }
+                        $question .= "]: ";
+                        $value = eZPrepareXML::getUserInput( $question, $default );
+                    } break;
+                    case "boolean":
+                    {
+                        $optionList = array('yes', 'no', 'y', 'n');
+                        $question .= " [" . implode(', ', $optionList) . "]: "; 
+                        $value = eZPrepareXML::getUserInput( $question, $default, $optionList );
+                        if ($value == 'y' || $value == 'yes')
+                        {
+                            $value = true;
+                        }
+                        else
+                        {
+                            $value = false;
+                        }
+                    } break;
+                    default:
+                    {
+                        $question .= ": ";
+                        $value = eZPrepareXML::getUserInput( $question, $default );
+                    }
+                }
                 $tpl->setVariable( $var, $value );
             }
         }
@@ -105,8 +147,7 @@ class eZPrepareXML
         while ( !$validInput )
         {
             $input = readline( $query );
-            if ( $acceptValues === false ||
-                 in_array( $input, $acceptValues ) )
+            if ( $acceptValues === false || in_array( $input, $acceptValues ) || $defaultValue != false )
             {
                 $validInput = true;
             }

@@ -23,12 +23,10 @@
 //
 //
 
-include_once('extension/ezxmlinstaller/classes/ezxmlinstallerhandler.php');
-
 class eZAddLocation extends eZXMLInstallerHandler
 {
 
-    function eZAddLocation( )
+    function __construct( )
     {
     }
 
@@ -42,30 +40,33 @@ class eZAddLocation extends eZXMLInstallerHandler
         $objectID = $this->getReferenceID( $xmlObjectID );
         $parentNodeID = $this->getReferenceID( $xmlParentNodeID );
 
+        $this->writeMessage( "\tAdding location(s) to object [$objectID].", "notice", "cyan" );
+
         if ( !$objectID )
         {
-            $this->writeMessage( "\tNo object defined.", 'error' );
+            $this->writeMessage( "\t\tNo object defined.", 'error' );
             return false;
         }
         if ( !$parentNodeID )
         {
-            $this->writeMessage( "\tNo location defined.", 'error' );
+            $this->writeMessage( "\t\tNo location defined.", 'error' );
             return false;
         }
 
         $object = eZContentObject::fetch( $objectID );
         if ( !$object )
         {
-            $this->writeMessage( "\tObject not found.", 'error' );
+            $this->writeMessage( "\t\tObject not found.", 'error' );
             return false;
         }
 
         $parentNode =  eZContentObjectTreeNode::fetch( $parentNodeID );
         if ( !$parentNode )
         {
-            $this->writeMessage( "\tparent node not found.", 'error' );
+            $this->writeMessage( "\t\tParent node not found.", 'error' );
             return false;
         }
+
         $node = $object->attribute( 'main_node' );
 
         $nodeAssignmentList = eZNodeAssignment::fetchForObject( $objectID, $object->attribute( 'current_version' ), 0, false );
@@ -126,13 +127,13 @@ class eZAddLocation extends eZXMLInstallerHandler
             {
                 eZUser::cleanupCache();
             }
-            $this->writeMessage( "\tAdded location of " . $object->attribute( 'name' ) . "  to Node $parentNodeID", 'notice' );
+            $this->writeMessage( "\t\tAdded location of " . $object->attribute( 'name' ) . " to node [$parentNodeID].", 'success' );
 
             $destNode = $insertedNode;
         }
         else
         {
-            $this->writeMessage( "\tLocation of " . $object->attribute( 'name' ) . "  to Node $parentNodeID already exists.", 'notice' );
+            $this->writeMessage( "\t\tLocation of " . $object->attribute( 'name' ) . " to node [$parentNodeID] already exists.", 'warning' );
 
             $destNode = eZContentObjectTreeNode::fetchObject( eZContentObjectTreeNode::definition(), null, array( 'parent_node_id' => $parentNodeID, 'contentobject_id' => $objectID ) );
         }

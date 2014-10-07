@@ -23,12 +23,10 @@
 //
 //
 
-include_once('extension/ezxmlinstaller/classes/ezxmlinstallerhandler.php');
-
 class eZSetSettings extends eZXMLInstallerHandler
 {
 
-    function eZSetSettings( )
+    function __construct( )
     {
     }
 

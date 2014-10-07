@@ -23,7 +23,6 @@
 //
 //
 
-include_once('extension/ezxmlinstaller/classes/ezxmlinstallerhandler.php');
 
 class eZCreateClass extends eZXMLInstallerHandler
 {
@@ -34,7 +33,7 @@ class eZCreateClass extends eZXMLInstallerHandler
      */
     private $adjustAttributesPlacement = false;
 
-    function eZCreateClass( )
+    function __construct( )
     {
     }
 

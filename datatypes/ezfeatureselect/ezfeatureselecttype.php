@@ -52,16 +52,15 @@ class eZFeatureSelectType extends eZDataType
             $template = 'design:' . $templateLocation;
             $attrContent = array();
             $tpl = eZTemplate::factory();
-            $tpl->setVariable( 'availible_feature_list', false );
+            $tpl->setVariable( 'xmlinstaller_feature_list', false );
 
             $content = $tpl->fetch( $template );
 
             $featureList = false;
-            if ( $tpl->variable( "availible_feature_list" ) !== false )
+            if ( $tpl->variable( "xmlinstaller_feature_list" ) !== false )
             {
-                $featureList = $tpl->variable( "availible_feature_list" );
+                $featureList = $tpl->variable( "xmlinstaller_feature_list" );
             }
-
             $defaultFeatureList = array();
             if ( $featureList )
             {
@@ -112,7 +111,7 @@ class eZFeatureSelectType extends eZDataType
         if ( $http->hasPostVariable( $variableName ) )
         {
             $data = $http->postVariable( $variableName );
-            $contentObjectAttribute->setAttribute( 'data_text', implode( ',', $data ) );
+            $contentObjectAttribute->setAttribute( 'data_text', serialize( $data ) );
         }
         else
         {
@@ -130,7 +129,7 @@ class eZFeatureSelectType extends eZDataType
         if ( $http->hasPostVariable( $base . "_ezfeatureselect_data_text_" . $contentObjectAttribute->attribute( "id" ) ) )
         {
             $dataText = $http->postVariable( $base . "_ezfeatureselect_data_text_" . $contentObjectAttribute->attribute( "id" ) );
-            $collectionAttribute->setAttribute( 'data_text', $dataText );
+            $collectionAttribute->setAttribute( 'data_text', serialize( $dataText ) );
             return true;
         }
         return false;
@@ -216,19 +215,18 @@ class eZFeatureSelectType extends eZDataType
         $template = 'design:' . $templateLocation;
         $attrContent = array();
         $tpl = eZTemplate::factory();
-        $tpl->setVariable( 'availible_feature_list', false );
+        $tpl->setVariable( 'xmlinstaller_feature_list', false );
 
 
         $content = $tpl->fetch( $template );
         $featureList = false;
-        if ( $tpl->variable( "availible_feature_list" ) !== false )
+        if ( $tpl->variable( "xmlinstaller_feature_list" ) !== false )
         {
-            $featureList = $tpl->variable( "availible_feature_list" );
+            $featureList = $tpl->variable( "xmlinstaller_feature_list" );
         }
 
-        $attrContent['availible_feature_list'] = $featureList;
-        $attrContent['installed_feature_list'] = explode( ',', $contentObjectAttribute->attribute( 'data_text' ) );
-
+        $attrContent['xmlinstaller_feature_list'] = $featureList;
+        $attrContent['installed_feature_list'] = unserialize( $contentObjectAttribute->attribute( 'data_text' ) );
         return $attrContent;
     }
 
@@ -288,7 +286,6 @@ class eZFeatureSelectType extends eZDataType
     */
     function sortKey( $contentObjectAttribute )
     {
-        //include_once( 'lib/ezpI18n::tr/classes/ezchartransform.php' );
         $trans = eZCharTransform::instance();
         return $trans->transformByGroup( $contentObjectAttribute->attribute( 'data_text' ), 'lowercase' );
     }
@@ -333,7 +330,6 @@ class eZFeatureSelectType extends eZDataType
     */
     function diff( $old, $new, $options = false )
     {
-        //include_once( 'lib/ezdiff/classes/ezdiff.php' );
         $diff = new eZDiff();
         $diff->setDiffEngineType( $diff->engineType( 'text' ) );
         $diff->initDiffEngine();

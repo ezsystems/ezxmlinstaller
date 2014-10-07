@@ -1,8 +1,8 @@
-eZ XML Installer extension 0.0.1 README
+eZ XML Installer extension 0.2.0 HOWTO
 
 
-What is the eZ XML Installer extension?
-=======================================
+How to use eZXMLInstaller
+=========================
 
    The eZ XML Installer extension is a plattform to define 
    proccesses for eZ Publish and execute them.
@@ -15,58 +15,82 @@ What is the eZ XML Installer extension?
    The set of handlers can be extended by custom handers.
 
 
-eZ XML Installer version
-========================
+Ways to use eZXMLInstaller in eZ Publish
+========================================
 
-The current version of eZ XML Installer is 0.0.1.
-You can find details about changes for this version in
-doc/changelogs/
+  There are three ways to use the eZXMLInstaller extension in eZ Publish.
+  It is possible to obtain a XML definition file (as file or template) as script parameter.
+  The second way is to use the provided datatype and set up a workflow.
+  And it is possible to use the API in a custom script, workflow, module or cronjob.
+
+Use as script
+-------------
+
+  The script can be found here: extension/ezxmlinstaller/bin/php/xmlinstaller.php
+
+  Beside the default options you can use the following options:
+    --file=VALUE      File with the xml definition to proceed
+                      The path absolute or relative from ez root dir should be given.
+    --template=VALUE  Location of the template to use
+                      The template path relative from the designs template dir should be given.
+                      e.g.: "xmlstuff/installme.tpl"
+                      This implicits that the --siteaccess parameter has been set and the file is available
+                      in the given siteaccess.
+    --user=VALUE      name of the user to use
+                      This parameter is optional.
+                      You should provide the name or id of the user in which context the script will run.
+                      Default is the admin (14).
+                    
+  You have to provide either the --file or the --template option.
+
+  The script will proccess the file or template.
+  If a template is given it is possible to request some information.
+  You will be asked for them, then the XML will be proccessed.
 
 
-License
-=======
+=== Use as workflow event ===
 
-This software is licensed under the GNU General Public License. The complete
-license agreement is included in the LICENSE file. For more information
-or questions please contact info@ez.no
-
-Requirements
-============
-
-The following requirements exists for using eZ XML Installer extension:
-
-o  eZ Publish version:
-
-   Make sure you use eZ Publish version 3.9 or higher.
-
-o  PHP version:
-
-   as indicated in your eZ Publish version requirements
+=== Use the API in a script ===
 
 
-Installation
-============
+== Handler documentation ==
 
-Please read the INSTALL file for installation instructions.
+=== <Handlername> ===
+- purpose
+- syntax
+- example
+- parameter
+
+=== How to implement a custom handler ===
+
+
+== XML exports ==
+
+=== Classes ===
+
+=== Roles ===
+
+
+
 
 
 Creating a custom proccess XML file
 ===================================
-A proccess XML files will be defined with a enclosing <eZXMLImporter> tag.
+A proccess XML files will be defined with a enclosing <eZXMLInstaller> tag.
 This tag contains a set of proccess definitions.
 Here is an example:
-<eZXMLImporter>
+<eZXMLInstaller>
     <ProccessInformation comment="Content in media sections" />
     <MyCustomAction>
         <DoThis value1="foo" value2="bar" />
         <DoThat myvalue="lorem" myothervalue="ipsum" />
     </MyCustomAction>
-</eZXMLImporter>
+</eZXMLInstaller>
 
 The XML structure of each action is defined by the handler.
 The proccess definition will be executed step by step downwards from top.
 
-The eZXMLImporter tag may contain some attributes which will be called "settings".
+The eZXMLInstaller tag may contain some attributes which will be called "settings".
 This can be global settings. E.g. where are some binary files located.
 
 Internal / External references
@@ -124,9 +148,9 @@ The XML must be defined in a variable block with the name "xml_data".
 Example:
 {set-block variable='xml_data'}
 <?xml version = '1.0' encoding = 'ISO-8859-1'?>
-<eZXMLImporter>
+<eZXMLInstaller>
 [...]
-</eZXMLImporter>
+</eZXMLInstaller>
 {/set-block}
 
 Defining and using template variables
@@ -169,25 +193,3 @@ Creating a custom handler
 =========================
 possible, but not documented yet.
 
-
-Where to get more help
-======================
-
-eZ Publish forums: http://ez.no/community/forum
-
-
-Troubleshooting
-===============
-
-1. Read the FAQ
-   ------------
-
-   Some problems are more common than others. The most common ones are listed
-   in the FAQ file.
-
-2. Support
-   -------
-
-   If you have find any problems not handled by this document or the FAQ you
-   can contact eZ system trough the support system:
-   http://ez.no/services/support

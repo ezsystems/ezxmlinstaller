@@ -29,13 +29,12 @@ $Module = array( 'name' => 'XML Export',
 
 $ViewList['classes'] = array(
     'functions' => array( 'export' ),
-    'script' => 'classes.php',
-    'params' => array( ) );
+    'script'    => 'classes.php',
+    'params'    => array( 'ClassID' ) );
 $ViewList['roles'] = array(
     'functions' => array( 'export' ),
-    'script' => 'roles.php',
-    'params' => array( ) );
-
+    'script'    => 'roles.php',
+    'params'    => array( ) );
 
 $FunctionList = array();
 $FunctionList['export'] = array( );

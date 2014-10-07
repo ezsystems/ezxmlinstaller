@@ -22,8 +22,7 @@
 //   MA 02110-1301, USA.
 //
 //
-
-require_once( 'autoload.php' );
+require 'autoload.php';
 
 function changeSiteAccessSetting( $siteaccess )
 {
@@ -74,10 +73,11 @@ $script = eZScript::instance( array( 'description'     => ( "eZ Publish XML inst
 
 $script->startup();
 
-$options = $script->getOptions( "[file:][template:]",
+$options = $script->getOptions( "[file:][template:][user:]",
                                 "",
-                                array( 'file' => 'file with xml definition',
-                                       'template' => 'name of template to use' ),
+                                array( 'file' => 'File with the xml definition to proceed',
+                                       'template' => 'Location of the template to use',
+                                       'user' => 'name of the user to use' ),
                                 false,
                                 array( 'user' => true ));
 
@@ -97,9 +97,16 @@ if ( !$script->isInitialized() )
     $script->shutdown( 0 );
 }
 
-$cli->output( "Checking requirements..." );
+$cli->output( $cli->stylize( "yellow", "Checking requirements...") );
+if ( isset( $options['user'] ) && $options['user'] )
+{
+    $user = eZUser::fetch( $options['user'] );
+}
+else
+{
+    $user = eZUser::fetchByName( 'admin' );
+}
 
-$user = eZUser::fetchByName( 'admin' );
 if ( $user )
 {
     eZUser::setCurrentlyLoggedInUser( $user, $user->attribute( 'contentobject_id' ) );
@@ -124,7 +131,7 @@ else
     $cli->error( "Need at least one argument." );
     $script->shutdown( 1 );
 }
-$cli->output( "Trying to install data from XML ..." );
+$cli->output( $cli->stylize( "yellow", "Trying to install data from XML ...") );
 
 if ( $xml == '' )
 {
