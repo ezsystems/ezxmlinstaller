@@ -9,7 +9,9 @@
             <Limitations>
             {foreach $policy.limitations as $limitation}
                 {foreach $limitation.values_as_array as $value}
-                    <{$limitation.identifier}>{$value}</{$limitation.identifier}>
+                    {def $class=fetch( 'content', 'class', hash( 'class_id', $value ) )}
+                    <{$limitation.identifier}>{$class.identifier|wash}</{$limitation.identifier}>
+                    {undef $class}
                 {/foreach}
             {/foreach}
             </Limitations>
