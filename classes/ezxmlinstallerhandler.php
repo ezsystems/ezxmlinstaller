@@ -38,7 +38,7 @@ class eZXMLInstallerHandler
         $this->StepCounter    = $counter;
     }
 
-    function execute()
+    function execute( $par )
     {
     }
 
